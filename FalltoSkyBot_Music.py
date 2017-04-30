@@ -1226,4 +1226,5 @@ async def on_ready():
     print('--------------------------')
     # await bot.change_presence(game=discord.Game(name='sakiut.fr | .help'))
 
-bot.run('token')
+token = getToken()
+bot.run(token)
