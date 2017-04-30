@@ -1,0 +1,2 @@
+api-key=RGAPI-cf47a674-15d9-404e-aa6e-67ac5282289b
+filepath=/Users/Utilisateur/DiscordBot/output.txt
