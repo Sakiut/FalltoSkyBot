@@ -27,4 +27,4 @@ Pour tout souci lié au bot, vous pouvez me contacter à
 a.sk.dmin@gmail.com
 
 Ou sur le serveur Discord de la Fall to Sky, ici :
-http://sakiut.fr/discord, Invitation No wS4k8r9
+http://sakiut.fr/discord, Invitation n° wS4k8r9
