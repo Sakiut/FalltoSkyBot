@@ -239,6 +239,7 @@ class LeagueOfLegends:
             try:
                 tmp = await self.bot.say("Processing request...")
                 await self.bot.delete_message(ctx.message)
+                user = user.replace(" ", "")
 
                 summoner = lol.getSummonerInfo(user)
                 game = lol.getGameInfo(summoner['id'])
@@ -319,7 +320,8 @@ class LeagueOfLegends:
                         await self.bot.edit_message(tmp, "[GAME][TEAM I][J"+str(i)+"] Summoner's name collected\n" + chargingBar)
                         print("[FTS][GAME][TEAM I][J"+str(i)+"] Summoner's name collected")
 
-                        Player = lol.getSummonerInfo(SummonerName)
+                        SummonerName2 = SummonerName.replace(" ", "")
+                        Player = lol.getSummonerInfo(SummonerName2)
 
                         bar[j] = '█████...'
                         chargingBar = '```\n[' + bar[0] + bar[1] + bar[2] + bar[3] + bar[4] + bar[5] + bar[6] + bar[7] + bar[8] + bar[9] + ']\n```'
@@ -417,7 +419,8 @@ class LeagueOfLegends:
                         await self.bot.edit_message(tmp, "[GAME][TEAM II][J" + str(i) + "] Summoner's name collected\n" + chargingBar)
                         print("[FTS][GAME][TEAM II][J" + str(i) + "] Summoner's name collected")
 
-                        player = lol.getSummonerInfo(SummonerName)
+                        SummonerName2 = SummonerName.replace(" ", "")
+                        player = lol.getSummonerInfo(SummonerName2)
                         playerID = player['id']
 
                         bar[j] = '█████...'
