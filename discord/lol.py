@@ -136,7 +136,10 @@ def getRankedStats(summonerid:str):
 	StatSummary = request['playerStatSummaries']
 	Ranked = filter(lambda x: x.get("playerStatSummaryType") == "RankedSolo5x5", StatSummary)
 	RankedList = list(Ranked)
-	RankedDict = RankedList[0]
+    	if RankedList == []:
+        	RankedDict = {"wins": 0, "aggregatedStats": {}, "losses": 0, "playerStatSummaryType": "RankedSolo5x5"}
+    	else:
+        	RankedDict = RankedList[0]
 	return RankedDict
 
 #####################################################################################################################################################
