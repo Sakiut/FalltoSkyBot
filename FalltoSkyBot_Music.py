@@ -14,6 +14,7 @@ from riotwatcher import LoLException, error_404, error_429
 import random
 import os
 import math
+import traceback
 
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -482,9 +483,11 @@ class LeagueOfLegends:
             except LoLException as e:
                 fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
                 await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
+                traceback.print_tb(e.__traceback__)
         except Exception as e:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
+            traceback.print_tb(e.__traceback__)
 
 class Vote:
     """Commandes de Vote"""
