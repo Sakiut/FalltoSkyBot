@@ -20,3 +20,11 @@ python -m pip install -U discord.py
 4. Se munir des libraries *youtube_dl* et *PyNaCl*
 5. Installer *FFMPEG*
 6. Le Bot se lance depuis FalltoSkyBot_Music.py
+
+### Contact
+
+Pour tout souci lié au bot, vous pouvez me contacter à
+a.sk.dmin@gmail.com
+
+Ou sur le serveur Discord de la Fall to Sky, ici :
+http://sakiut.fr/discord, Invitation No wS4k8r9
