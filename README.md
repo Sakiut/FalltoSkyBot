@@ -21,7 +21,10 @@ python -m pip install -U discord.py
 ```
 4. Se munir des libraries *youtube_dl* et *PyNaCl*
 5. Installer *FFMPEG*
-6. Le Bot se lance depuis FalltoSkyBot_Music.py
+6. Sur le site des applications Discord, créer votre app
+7. Récupérez-en le token, et remplacez le dans le fichier token.txt, ce fichier ne doit contenir que le token,
+8. Ajoutez le bot à votre serveur
+9. Le Bot se lance depuis FalltoSkyBot_Music.py
 
 ### Contact
 
