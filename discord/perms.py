@@ -2,9 +2,8 @@
 
 """Ces fonctions sont utilisées afin de permettre
 de récupérer la totalité des données de permissions
-des utilisateurs.
-
-Créé par @Sakiut25#7390 (c)"""
+des utilisateurs et pour des fonctions annexes 
+utilisées par le bot."""
 
 #####################################################################################################################################################
 
