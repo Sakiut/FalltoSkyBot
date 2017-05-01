@@ -8,11 +8,12 @@ import datetime
 from riotwatcher import RiotWatcher
 from riotwatcher import EUROPE_WEST
 from riotwatcher import LoLException, error_404, error_429
+from discord.perms import *
 from urllib import request
 import linecache
 import ast
 
-ApiKey = 'RGAPI-cf47a674-15d9-404e-aa6e-67ac5282289b'
+ApiKey = getApiKey()
 
 w = RiotWatcher(ApiKey, default_region=EUROPE_WEST)
 
