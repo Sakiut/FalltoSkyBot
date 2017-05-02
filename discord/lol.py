@@ -252,3 +252,21 @@ def dateConverter(date:str):
 	return FinalDate
 
 #####################################################################################################################################################
+
+def getFreeChamps():
+
+	request = requests.get("https://euw1.api.riotgames.com/lol/platform/v3/champions?freeToPlay=true&api_key=" + ApiKey)
+
+	if request.status_code == 200:
+		request = request.json()
+
+	content = request['champions']
+	freeChamps = []
+
+	for x in content:
+		Id = x['id']
+		freeChamps.append(str(Id))
+
+	return freeChamps
+
+#####################################################################################################################################################
