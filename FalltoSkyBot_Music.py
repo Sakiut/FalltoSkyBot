@@ -27,7 +27,6 @@ if not discord.opus.is_loaded():
 print('[FTS] Connecting...')
 
 freshestMemes = ["mem/meme1.jpeg", "mem/meme2.jpeg", "mem/meme3.jpeg", "mem/meme6.jpeg", "mem/meme7.jpeg", "mem/meme8.jpeg", "mem/meme9.jpeg", "mem/meme10.jpeg", "mem/meme11.jpeg", "mem/meme12.jpeg", "mem/meme14.jpeg","mem/meme15.jpeg"]
-emojis = ["<:fts:287890580627914752>", "<:_3:288319958008463360>", "<:fts_white:287890229707276288>", '<:like:297409746833637377>', '<:dislike:297410671258107904>']
 
 class VoiceEntry:
     def __init__(self, message, player):
@@ -232,7 +231,32 @@ class LeagueOfLegends:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
+    async def freechamps(self, ctx):
+
+        await self.bot.delete_message(ctx.message)
+        tmp = await self.bot.say("Processing request...")
+
+        ChampsIds = lol.getFreeChamps()
+        ChampsNames = []
+        Message = "```css"
+
+        for x in ChampsIds:
+            ChampsNames.append(lol.getChampionName(x))
+
+        for x in ChampsNames:
+            Message += "\n" + x
+
+        ChampionEmbed = discord.Embed()
+        ChampionEmbed.colour = 0x3498db
+        ChampionEmbed.title = "Free Champions"
+        ChampionEmbed.description = Message + "\n```"
+        ChampionEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
+
+        await self.bot.delete_message(tmp)
+        await self.bot.say(embed=ChampionEmbed)
+            
+    @commands.command(pass_context=True, no_pm=False)
     async def game(self, ctx, *, user:str):
         """Montre les statistiques d'une game en cours"""
 
@@ -772,6 +796,33 @@ class Admin:
                 await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 
     @commands.command(pass_context=True, no_pm=True)
+    async def serverinfo(self, ctx):
+        """Donne les informations du serveur"""
+
+        server = ctx.message.server
+        await self.bot.delete_message(ctx.message)
+        tmp = await self.bot.say('Processing request...')
+        VerifLevel = str(server.verification_level)
+
+        ServerEmbed = discord.Embed()
+        ServerEmbed.colour = 0x3498db
+        ServerEmbed.set_thumbnail(url=server.icon_url)
+        ServerEmbed.add_field(name = "Server Name", value = server.name)
+        ServerEmbed.add_field(name = "Server ID", value = server.id)
+        ServerEmbed.add_field(name = "Owner's Name", value = server.owner.name)
+        ServerEmbed.add_field(name = "Owner's ID", value = server.owner.id)
+        ServerEmbed.add_field(name = "Users", value = server.member_count)
+        ServerEmbed.add_field(name = "Verification level", value = VerifLevel.upper())
+        ServerEmbed.add_field(name = "Region", value = formatServerRegion(server.region))
+        ServerEmbed.add_field(name = "Creation Date", value = lol.dateConverter(server.created_at))
+        ServerEmbed.add_field(name = "Roles", value = formatServerRoles(server.role_hierarchy), inline=False)
+        ServerEmbed.add_field(name = "Emojis", value = formatEmojis(server.emojis), inline = False)
+        ServerEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
+
+        await self.bot.delete_message(tmp)
+        await self.bot.say(embed=ServerEmbed)
+        
+    @commands.command(pass_context=True, no_pm=True)
     async def convoque(self, ctx, user=None, *, reason):
         """Envoie une convocation au joueur cité"""
 
@@ -963,34 +1014,17 @@ class Messages:
         print('[FTS] Calculation done and sent')
 
     @commands.command(pass_context=True, no_pm=True)
-    async def emoji(self, ctx, emoji=1):
-        """Donne un emoji parmi la liste des emotes ajoutés sur le serveur
-
-        1 - :fts:
-        2 - :_3:
-        3 - :fts_white:
-        4 - :like:
-        5 - :dislike:
-        """
-        emoji = emoji - 1
-        msg = emojis[emoji]
+    async def emojis(self, ctx):
+        """Donne la liste des emojis du serveur"""
+        
         await self.bot.delete_message(ctx.message)
-        await self.bot.say(msg)
-        print('[FTS] Emoji n°{} sent'.format(emoji))
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def allemoji(self, ctx, limit=5):
-        """Donne la liste des x premiers emojis du serveur"""
-        await self.bot.delete_message(ctx.message)
-        if limit < 1:
-            await self.bot.say("Sended 0 emojis")
-        else:
-            i = 0
-            for a in range(limit):
-                msg = emojis[i]
-                await self.bot.say(msg)
-                i = i + 1
-            print('[FTS] Sended {} emojis'.format(limit))
+        EmojiEmbed = discord.Embed()
+        EmojiEmbed.colour = 0x3498db
+        EmojiEmbed.title = "Emojis for {0}".format(ctx.message.server.name)
+        EmojiEmbed.description = formatEmojis(ctx.message.server.emojis)
+
+        await self.bot.say(embed=EmojiEmbed)
 
 class Music:
     """Commandes Vocales"""
