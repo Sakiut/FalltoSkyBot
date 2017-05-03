@@ -2,3 +2,12 @@ __pycache__/
 sample_config.txt
 api.txt
 token.txt
+.idea
+discord
+docs
+examples
+lol-scout-updater-master
+api.html
+favicon.ico
+get-pip.py
+setup.py
