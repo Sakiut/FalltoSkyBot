@@ -644,7 +644,7 @@ class Jeux:
         self.bot = bot
         self.voice_states = {}
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def ZCasino(self, ctx, mise, nb):
         """Bienvenue au ZCasino !
 
@@ -886,25 +886,25 @@ class Messages:
         self.bot = bot
         self.voice_states = {}
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def hi(self, ctx):
         """Fall to Sky vous salue"""
         await self.bot.say("Salut {0.message.author.mention} !".format(ctx))
         print('[FTS] Hello Message sent')
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def ip(self, ctx):
         """Envoie l'IP du serveur HolyFTS"""
         await self.bot.say("{0.message.author.mention} IP du serveur HolyFTS : holyfts.boxtoplay.com".format(ctx))
         print('[FTS] IP sent')
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def website(self, ctx):
         """Affiche le site web du serveur"""
         await self.bot.say("{0.message.author.mention} Site web du serveur : http://sakiut.fr/discord".format(ctx))
         print("[FTS] Website's URL sent")
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def meme(self, ctx):
         """Affiche une meme random parmi la bibliothèque"""
         print('[FTS] Sending Meme...')
@@ -912,34 +912,34 @@ class Messages:
         await self.bot.send_file(ctx.message.channel, mem)
         print('[FTS] Meme Sent')
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def echo(self, ctx, *, mess : str):
         """Répète le message de l'utilisateur"""
         await self.bot.delete_message(ctx.message)
         await self.bot.say(mess)
         print('[FTS] Message sent :', mess)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def mpecho(self, ctx, user:discord.Member, *, mess : str):
         """Envoie un MP via le bot"""
         await self.bot.delete_message(ctx.message)
         await self.bot.send_message(user, mess)
         print('[FTS] Message sent to {0.name} : {1}'.format(user, mess))
-		
-    @commands.command(pass_context=True, no_pm=True)
+
+    @commands.command(pass_context=True, no_pm=False)
     async def report(self, ctx, user: discord.Member, *, reason: str):
         """Reporte un utilisateur au staff"""
         await self.bot.delete_message(ctx.message)
         await self.bot.send_message(bot.get_channel('298029242871185408'), "{0} a été report par {1}, raison : {2}, @here".format(user.mention, ctx.message.author.mention, reason))
         print('[FTS] {0} has been reported by {1}'.format(user, ctx.message.author))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def bug(self, ctx, *, subject:str):
         """Rapporte un bug du bot à l'équipe de dev"""
         await self.bot.delete_message(ctx.message)
         await self.bot.send_message(bot.get_channel('307799958965190656'), "Un bug a été report par {0}, sujet : {1}, @here".format(ctx.message.author.mention, subject))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def roll(self, ctx, start: int=0, end: int=10):
         """Donne un nombre aléatoire entre [start] et [end]"""
         rand = random.randint(start, end)
@@ -980,7 +980,7 @@ class Messages:
             await self.bot.say("Vous n'avez pas l'autorisation de gérer les messages")
             print('[FTS] Purge : Command aborted : User do not have manage_messages permission')
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True) #FIXME : Non fonctionnel - bug ?
     async def purgeuser(self, ctx, limit=10, *, user:discord.Member):
         """Supprime le nombre de messages spécifié du membre choisi
 
@@ -1011,7 +1011,7 @@ class Messages:
         await self.bot.say("{0.message.author.mention} Pour m'ajouter, utiliser ce lien : https://discordapp.com/oauth2/authorize?client_id=283379732538720256&scope=bot&permissions=8".format(ctx))
         print('[FTS] Add message sent')
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def messcount(self, ctx, limit=1000):
         """Donne le nombre de messages envoyés dans le channel"""
         await self.bot.delete_message(ctx.message)
