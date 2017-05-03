@@ -3,6 +3,7 @@ import asyncio
 import random
 import os
 import math
+from libraries.library import getToken
 
 client = discord.Client()
 
@@ -122,4 +123,4 @@ async def on_message(e):
     	await client.send_file(e.channel, mem)
     	print('[FTS] Meme Sent')
 
-client.run('MjgzMzc5NzMyNTM4NzIwMjU2.C4098g.HJVW-oMNB2W0IEzIIWQn4s1dENI')
+client.run(getToken())
