@@ -16,15 +16,17 @@ L'application est soumise à la license AGPLv3
 1. Récupérer l'archive
 2. Nécessite Python 3.5 + pip
 3. Installer l'API Discord avec
-```
+```cmd
 python -m pip install -U discord.py
 ```
-4. Se munir des libraries *youtube_dl* et *PyNaCl*
-5. Installer *FFMPEG*
+4. Se munir des libraries `youtube_dl` et `PyNaCl`
+5. Installer `FFMPEG`
 6. Sur le site des applications Discord, créer votre app
-7. Récupérez-en le token, et remplacez le dans le fichier token.txt, ce fichier ne doit contenir que le token,
+7. Récupérez-en le token, et remplacez le dans le fichier `token.txt`, ce fichier ne doit contenir que le token,
 8. Ajoutez le bot à votre serveur
 9. Le Bot se lance depuis FalltoSkyBot_Music.py
+
+**Pour les fonctionnalités associées à League of Legends, vous devrez vous munir d'un compte Riot Games et de la clé d'API qui y est associée, que vous placerez dans le fichier `api.txt`.**
 
 ### Contact
 
