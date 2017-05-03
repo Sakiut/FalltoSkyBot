@@ -1,0 +1,5 @@
+Python 3.5
+discordpy
+FFMPEG
+youtube_dl
+PyNaCl
