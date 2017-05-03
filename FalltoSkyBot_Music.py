@@ -920,6 +920,13 @@ class Messages:
         print('[FTS] Message sent :', mess)
 
     @commands.command(pass_context=True, no_pm=True)
+    async def mpecho(self, ctx, user:discord.Member, *, mess : str):
+        """Envoie un MP via le bot"""
+        await self.bot.delete_message(ctx.message)
+        await self.bot.send_message(user, mess)
+        print('[FTS] Message sent to {0.name} : {1}'.format(user, mess))
+		
+    @commands.command(pass_context=True, no_pm=True)
     async def report(self, ctx, user: discord.Member, *, reason: str):
         """Reporte un utilisateur au staff"""
         await self.bot.delete_message(ctx.message)
