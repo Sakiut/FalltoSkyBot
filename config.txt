@@ -1,4 +1,4 @@
-apikey=RGAPI-d9fb8651-33fd-4604-8157-f046149b9297
-token=MjgzMzc5NzMyNTM4NzIwMjU2.C4098g.HJVW-oMNB2W0IEzIIWQn4s1dENI
-serverip=holyfts.boxtoplay.com
-website=http://sakiut.fr/discord
+apikey=[API KEY]
+token=[TOKEN]
+serverip=[SERVERIP]
+website=[WEBSITE]
