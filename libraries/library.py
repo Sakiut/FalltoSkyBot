@@ -15,6 +15,8 @@ from urllib import request
 import linecache
 import ast
 
+fileName = './config.txt'
+
 #####################################################################################################################################################
 
 def get_user_roles(user):
@@ -51,8 +53,13 @@ def getServerRules():
 
 def getToken():
 
-    fileName = './token.txt'
-    with open(fileName) as f: token = f.read()
+    with open(fileName) as f: lines = f.read().splitlines()
+
+    for line in lines:
+        if line.startswith('token='):
+            getLine = line
+            Line = getLine.split('=')
+            token = Line[1]
 
     return token
 
@@ -60,10 +67,43 @@ def getToken():
 
 def getApiKey():
 
-    fileName = './api.txt'
-    with open(fileName) as f: apiKey = f.read()
+    with open(fileName) as f: lines = f.read().splitlines()
 
-    return apiKey
+    for line in lines:
+        if line.startswith('apikey='):
+            getLine = line
+            Line = getLine.split('=')
+            ApiKey = Line[1]
+
+    return ApiKey
+
+#####################################################################################################################################################
+
+def getServerIP():
+
+    with open(fileName) as f: lines = f.read().splitlines()
+
+    for line in lines:
+        if line.startswith('serverip='):
+            getLine = line
+            Line = getLine.split('=')
+            ServerIP = Line[1]
+
+    return ServerIP
+
+#####################################################################################################################################################
+
+def getWebSite():
+
+    with open(fileName) as f: lines = f.read().splitlines()
+
+    for line in lines:
+        if line.startswith('website='):
+            getLine = line
+            Line = getLine.split('=')
+            WebSite = Line[1]
+
+    return WebSite
 
 #####################################################################################################################################################
 

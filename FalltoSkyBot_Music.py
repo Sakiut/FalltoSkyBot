@@ -895,13 +895,13 @@ class Messages:
     @commands.command(pass_context=True, no_pm=False)
     async def ip(self, ctx):
         """Envoie l'IP du serveur HolyFTS"""
-        await self.bot.say("{0.message.author.mention} IP du serveur HolyFTS : holyfts.boxtoplay.com".format(ctx))
+        await self.bot.say("{0.message.author.mention} IP du serveur HolyFTS : {1}".format(ctx, getServerIP()))
         print('[FTS] IP sent')
 
     @commands.command(pass_context=True, no_pm=False)
     async def website(self, ctx):
         """Affiche le site web du serveur"""
-        await self.bot.say("{0.message.author.mention} Site web du serveur : http://sakiut.fr/discord".format(ctx))
+        await self.bot.say("{0.message.author.mention} Site web du serveur : {1}".format(ctx, getWebSite()))
         print("[FTS] Website's URL sent")
 
     @commands.command(pass_context=True, no_pm=False)
