@@ -919,7 +919,7 @@ class Messages:
         await self.bot.say(mess)
         print('[FTS] Message sent :', mess)
 
-    @commands.command(pass_context=True, no_pm=False)
+    @commands.command(pass_context=True, no_pm=True)
     async def mpecho(self, ctx, user:discord.Member, *, mess : str):
         """Envoie un MP via le bot"""
         await self.bot.delete_message(ctx.message)
