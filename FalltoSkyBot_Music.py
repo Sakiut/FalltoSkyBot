@@ -27,7 +27,20 @@ if not discord.opus.is_loaded():
 
 print('[FTS] Connecting...')
 
-freshestMemes = ["mem/meme1.jpeg", "mem/meme2.jpeg", "mem/meme3.jpeg", "mem/meme6.jpeg", "mem/meme7.jpeg", "mem/meme8.jpeg", "mem/meme9.jpeg", "mem/meme10.jpeg", "mem/meme11.jpeg", "mem/meme12.jpeg", "mem/meme14.jpeg","mem/meme15.jpeg"]
+freshestMemes = [
+"mem/meme1.jpeg",
+"mem/meme2.jpeg",
+"mem/meme3.jpeg",
+"mem/meme6.jpeg",
+"mem/meme7.jpeg",
+"mem/meme8.jpeg",
+"mem/meme9.jpeg",
+"mem/meme10.jpeg",
+"mem/meme11.jpeg",
+"mem/meme12.jpeg",
+"mem/meme14.jpeg",
+"mem/meme15.jpeg"
+]
 
 class VoiceEntry:
     def __init__(self, message, player):
@@ -729,30 +742,62 @@ class Admin:
         else:
             tmp = await self.bot.say("Récupération des permissions...")
 
-            admin = get_perm_admin(member)
-            cii = get_perm_create_instant_invite(member)
-            kick = get_perm_kick_members(member)
-            ban = get_perm_ban_members(member)
-            m_chans = get_perm_manage_channels(member)
-            m_srv = get_perm_manage_server(member)
-            add_react = get_perm_add_reactions(member)
-            tts = get_perm_send_tts_messages(member)
-            m_mess = get_perm_manage_messages(member)
-            mute = get_perm_mute(member)
-            deafen = get_perm_deafen(member)
-            sd_embed = get_perm_send_embed_links(member)
-            attach_files = get_perm_attach_files(member)
-            everyone = get_perm_mention_everyone(member)
-            ext_emo = get_perm_external_emojis(member)
-            nick = get_perm_change_nickname(member)
-            m_nick = get_perm_change_nickname(member)
-            m_roles = get_perm_manage_roles(member)
-            m_webhooks = get_perm_manage_webhooks(member)
-            m_emo = get_perm_manage_emojis(member)
+            perms = [
+            get_perm_admin(member),
+            get_perm_create_instant_invite(member),
+            get_perm_kick_members(member),
+            get_perm_ban_members(member),
+            get_perm_manage_channels(member),
+            get_perm_manage_server(member),
+            get_perm_add_reactions(member),
+            get_perm_send_tts_messages(member),
+            get_perm_manage_messages(member),
+            get_perm_mute(member),
+            get_perm_deafen(member),
+            get_perm_send_embed_links(member),
+            get_perm_attach_files(member),
+            get_perm_mention_everyone(member),
+            get_perm_external_emojis(member),
+            get_perm_change_nickname(member),
+            get_perm_manage_nicknames(member),
+            get_perm_manage_roles(member),
+            get_perm_manage_webhooks(member),
+            get_perm_manage_emojis(member)]
+
+            titles = [
+            "Permissions administrateur",
+            "Créer invitations",
+            "Éjecter les membres",
+            "Bannir les membres",
+            "Gérer les channels",
+            "Gérer le serveur",
+            "Ajouter des réactions",
+            "Envoyer des messages tts",
+            "Gérer les messages",
+            "Rendre muet",
+            "Rendre sourd",
+            "Envoyer des messages Embed",
+            "Envoyer des pièces jointes",
+            "Mentionner everyone",
+            "Utiliser des emojis externes au serveur",
+            "Changer son pseudo",
+            "Gérer les pseudos",
+            "Gérer les roles",
+            "Gérer les WebHooks",
+            "Gérer les Emojis"]
+
+            MsgBase = ctx.message.author.mention + " Voici les permissions de " + member.mention + " : ```scheme\n"
+            Msg = MsgBase
+
+            for perm, title in zip(perms, titles):
+                fmt = "[>] {0:45} {1:12}\n".format(title, perm)
+                Msg += fmt
+
+            Msg += "```"
 
             await self.bot.delete_message(ctx.message)
             await self.bot.delete_message(tmp)
-            await self.bot.say(ctx.message.author.mention + " Voici les permissions de " + member.mention + " : ```Permissions administrateur : " + admin + "\nCréer invitations : " + cii + "\nÉjecter les membres : " + kick + "\nBannir les membres : " + ban + "\nGérer les channels : " + m_chans + "\nGérer le serveur : " + m_srv + "\nAjouter une réaction : " + add_react + "\nEnvoyer des messages tts : " + tts + "\nGérer les messages : " + m_mess + "\nRendre muets les utilisateurs : " + mute + "\nRendre sourds les utilisateurs : " + deafen + "\nEnvoyer des messages intégrés : " + sd_embed + "\nEnvoyer des pièces jointes : " + attach_files + "\nMentionner everyone : " + everyone + "\nUtiliser des emojis externes au serveur : " + ext_emo + "\nChanger son pseudo : " + nick + "\nGérer les pseudonymes : " + m_nick + "\nGérer les rôles : " + m_roles + "\nGérer les webhooks : " + m_webhooks + "\nGérer les emojis : " + m_emo + "```")
+            await self.bot.say(Msg)
 
             print('[FTS] Permissions message sent')
 
