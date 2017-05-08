@@ -1098,21 +1098,24 @@ class Messages:
             ldRequest = getLDStats(pseudo)
             Names = ldRequest['Names']
             Values = ldRequest['Values']
-            Message = "```css"
-            i = 0
 
-            for x in Names:
-                Message += "\n {0:15} {1:15}".format(Names[i], Values[i])
-                i += 1
+            # Message = "```css"
+            # i = 0
 
-            Message += "\n```"
+            # for x in Names:
+            #     Message += "\n {0:15} {1:15}".format(Names[i], Values[i])
+            #     i += 1
+
+            # Message += "\n```"
 
             LDEmbed = discord.Embed()
             LDEmbed.colour = 0x3498db
-            LDEmbed.description = Message
             LDEmbed.set_author(name = "LevelDown Stats for {0}".format(pseudo), icon_url = 'http://leveldown.fr/dist/images/webtv.png')
             LDEmbed.set_thumbnail(url=getLDIcon(pseudo))
             LDEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
+
+            for Name, Value in zip(Names, Values):
+                LDEmbed.add_field(name = Name, value = Value)
 
             await self.bot.delete_message(tmp)
             await self.bot.say(embed=LDEmbed)
