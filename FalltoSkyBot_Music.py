@@ -253,27 +253,32 @@ class LeagueOfLegends:
     @commands.command(pass_context=True, no_pm=False)
     async def freechamps(self, ctx):
 
-        await self.bot.delete_message(ctx.message)
-        tmp = await self.bot.say("Processing request...")
+        try:
+            await self.bot.delete_message(ctx.message)
+            tmp = await self.bot.say("Processing request...")
 
-        ChampsIds = lol.getFreeChamps()
-        ChampsNames = []
-        Message = "```scheme"
+            ChampsIds = lol.getFreeChamps()
+            ChampsNames = []
+            Message = "```scheme"
 
-        for x in ChampsIds:
-            ChampsNames.append(lol.getChampionName(x))
+            for x in ChampsIds:
+                ChampsNames.append(lol.getChampionName(x))
 
-        for x in ChampsNames:
-            Message += "\n[>] " + x
+            for x in ChampsNames:
+                Message += "\n[>] " + x
 
-        ChampionEmbed = discord.Embed()
-        ChampionEmbed.colour = 0x3498db
-        ChampionEmbed.set_author(name = "Free Champions", icon_url = 'https://static-cdn.jtvnw.net/jtv_user_pictures/milleniumtvlol-profile_image-ff2429286c8c534a-300x300.png')
-        ChampionEmbed.description = Message + "\n```"
-        ChampionEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
+            ChampionEmbed = discord.Embed()
+            ChampionEmbed.colour = 0x3498db
+            ChampionEmbed.set_author(name = "Free Champions", icon_url = 'https://static-cdn.jtvnw.net/jtv_user_pictures/milleniumtvlol-profile_image-ff2429286c8c534a-300x300.png')
+            ChampionEmbed.description = Message + "\n```"
+            ChampionEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
 
-        await self.bot.delete_message(tmp)
-        await self.bot.say(embed=ChampionEmbed)
+            await self.bot.delete_message(tmp)
+            await self.bot.say(embed=ChampionEmbed)
+
+        except Exception as e:
+            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
+            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 
     @commands.command(pass_context=True, no_pm=False)
     async def game(self, ctx, *, user:str):
@@ -1009,7 +1014,7 @@ class Messages:
 
         100 Messages seront supprimés par défaut
 
-        Cette commande ne peut être utilisé que par les utilisateurs ayant la permission de gérer les messages
+        Cette commande ne peut être utilisée que par les utilisateurs ayant la permission de gérer les messages
         """
 
         member = ctx.message.author
