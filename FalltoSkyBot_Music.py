@@ -258,17 +258,17 @@ class LeagueOfLegends:
 
         ChampsIds = lol.getFreeChamps()
         ChampsNames = []
-        Message = "```css"
+        Message = "```scheme"
 
         for x in ChampsIds:
             ChampsNames.append(lol.getChampionName(x))
 
         for x in ChampsNames:
-            Message += "\n" + x
+            Message += "\n[>] " + x
 
         ChampionEmbed = discord.Embed()
         ChampionEmbed.colour = 0x3498db
-        ChampionEmbed.title = "Free Champions"
+        ChampionEmbed.set_author(name = "Free Champions", icon_url = 'https://static-cdn.jtvnw.net/jtv_user_pictures/milleniumtvlol-profile_image-ff2429286c8c534a-300x300.png')
         ChampionEmbed.description = Message + "\n```"
         ChampionEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
 
@@ -1098,15 +1098,6 @@ class Messages:
             ldRequest = getLDStats(pseudo)
             Names = ldRequest['Names']
             Values = ldRequest['Values']
-
-            # Message = "```css"
-            # i = 0
-
-            # for x in Names:
-            #     Message += "\n {0:15} {1:15}".format(Names[i], Values[i])
-            #     i += 1
-
-            # Message += "\n```"
 
             LDEmbed = discord.Embed()
             LDEmbed.colour = 0x3498db
