@@ -767,7 +767,8 @@ class Admin:
             get_perm_manage_nicknames(member),
             get_perm_manage_roles(member),
             get_perm_manage_webhooks(member),
-            get_perm_manage_emojis(member)]
+            get_perm_manage_emojis(member),
+            get_perm_view_audit_logs(member)]
 
             titles = [
             "Permissions administrateur",
@@ -789,7 +790,8 @@ class Admin:
             "Gérer les pseudos",
             "Gérer les roles",
             "Gérer les WebHooks",
-            "Gérer les Emojis"]
+            "Gérer les Emojis",
+            "Voir les logs"]
 
             MsgBase = ctx.message.author.mention + " Voici les permissions de " + member.mention + " : ```scheme\n"
             Msg = MsgBase
