@@ -929,6 +929,23 @@ class Admin:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def disconnect(self, ctx):
+        """Déconnecte le bot - Bot Master uniquement"""
+        requester = ctx.message.author
+        await self.bot.delete_message(ctx.message)
+        if requester.name == 'Sakiut25':
+            await self.bot.send_message(bot.get_channel('283397577552953344'), "```Déconnection du bot```")
+            print('[FTS] Déconnexion...')
+            bot.logout()
+            print('[FTS] Logged out')
+            bot.close()
+            print('[FTS] Connexions closed')
+            os.system('pause')
+            exit()
+        else:
+            await self.bot.say("Vous n'êtes pas le Bot Master")
+
 class Messages:
     """Commandes Textuelles"""
 
