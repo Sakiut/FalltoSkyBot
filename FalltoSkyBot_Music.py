@@ -1309,13 +1309,16 @@ class Music:
             await self.bot.say('Requester requested skipping song...')
             state.skip()
             print('[FTS] Music skipped by Requester')
+
         elif voter.server_permissions.administrator == True:
             await self.bot.say('Admin requested skipping song...')
             state.skip()
             print('[FTS] Music skipped by Admin')
+
         elif voter.id not in state.skip_votes:
             state.skip_votes.add(voter.id)
             total_votes = len(state.skip_votes)
+            
             if total_votes >= 3:
                 await self.bot.say('Skip vote passed, skipping song...')
                 state.skip()
