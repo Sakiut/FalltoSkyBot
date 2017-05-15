@@ -6,6 +6,7 @@ import time
 from decimal import *
 import sys
 import datetime
+import discord
 
 from riotwatcher import RiotWatcher
 from riotwatcher import EUROPE_WEST
@@ -43,6 +44,7 @@ def get_user_roles(user):
 #####################################################################################################################################################
 
 def getServerRules():
+	"""Récupère les règles du serveur depuis le fichier où elles sont enregistrées"""
 
 	fileName = './rules.txt'
 	with open(fileName) as f: rulesLines = f.read()
@@ -52,6 +54,7 @@ def getServerRules():
 #####################################################################################################################################################
 
 def getToken():
+	"""Récupère le token depuis le fichier `config.txt`"""
 
 	with open(fileName) as f: lines = f.read().splitlines()
 
@@ -66,6 +69,7 @@ def getToken():
 #####################################################################################################################################################
 
 def getApiKey():
+	"""Récupère la clé d'API depuis le fichier `config.txt`"""
 
 	with open(fileName) as f: lines = f.read().splitlines()
 
@@ -80,6 +84,7 @@ def getApiKey():
 #####################################################################################################################################################
 
 def getServerIP():
+	"""Récupère l'IP depuis le fichier `config.txt`"""
 
 	with open(fileName) as f: lines = f.read().splitlines()
 
@@ -94,6 +99,7 @@ def getServerIP():
 #####################################################################################################################################################
 
 def getWebSite():
+	"""Récupère le site web affilié au serveur depuis `config.txt`"""
 
 	with open(fileName) as f: lines = f.read().splitlines()
 
@@ -108,6 +114,7 @@ def getWebSite():
 #####################################################################################################################################################
 
 def formatServerRegion(region):
+	"""Formate l'affichage de l'option Server Region"""
 
 	Region = str(region)
 	Region = Region.replace("_", " ")
@@ -118,6 +125,7 @@ def formatServerRegion(region):
 #####################################################################################################################################################
 
 def formatServerRoles(rolesObjects:list):
+	"""Reformate la liste des Roles du serveur"""
 
 	RoleFinal = ""
 
@@ -131,6 +139,7 @@ def formatServerRoles(rolesObjects:list):
 #####################################################################################################################################################
 
 def formatEmojis(emojisObjects:list):
+	"""Reformate la liste des Emojis du serveur"""
 
 	EmojisFinal = ""
 
@@ -144,6 +153,7 @@ def formatEmojis(emojisObjects:list):
 #####################################################################################################################################################
 
 def getServerEmojis(emojisObjects:list):
+	"""Récupère les emojis du serveur"""
 
 	EmojisFinal = "{0:6} {1:10} {2:18}\n----------------------------------------".format("Emote", "Name", 'ID')
 
@@ -157,6 +167,7 @@ def getServerEmojis(emojisObjects:list):
 #####################################################################################################################################################
 
 def getLDStats(pseudo):
+	"""Récupère les stats leveldown depuis leur site"""
 
 	pseudo = str(pseudo)
 	url = "http://leveldown.fr/profile/{}".format(pseudo)
@@ -187,6 +198,7 @@ def getLDStats(pseudo):
 #####################################################################################################################################################
 
 def getLDIcon(pseudo):
+	"""Récupère l'icone leveldown depuis leur site"""
 
 	pseudo = str(pseudo)
 	url = "http://leveldown.fr/profile/{}".format(pseudo)
@@ -205,5 +217,35 @@ def getLDIcon(pseudo):
 			Line = Line[1]
 
 	return Line
+
+#####################################################################################################################################################
+
+def getTextChannels(server:discord.Server):
+	"""Retourne la liste des channels textuels du serveur"""
+
+	Channels = server.channels
+	End = []
+
+	for chan in Channels:
+		Type = str(chan.type)
+		if Type is 'text':
+			End.append(chan.name)
+
+	return End
+
+#####################################################################################################################################################
+
+def getVoiceChannels(server:discord.Server):
+	"""Retourne la liste des channels vocaux du serveur"""
+
+	Channels = server.channels
+	End = []
+
+	for chan in Channels:
+		Type = str(chan.type)
+		if Type is 'voice':
+			End.append(chan.name)
+
+	return End
 
 #####################################################################################################################################################

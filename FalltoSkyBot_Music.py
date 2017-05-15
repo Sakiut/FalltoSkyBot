@@ -882,7 +882,9 @@ class Admin:
 
     @commands.command(pass_context=True, no_pm=True)
     async def convoque(self, ctx, user=None, *, reason):
-        """Envoie une convocation au joueur cité"""
+        """Envoie une convocation au joueur cité
+
+        Nécessite le droit de ban"""
 
         author = ctx.message.author
         if author.server_permissions.ban_members == True:
@@ -899,17 +901,34 @@ class Admin:
                 await self.bot.delete_message(ctx.message)
                 tmp = await self.bot.say("Processing...")
 
-            ConvocEmbed = discord.Embed()
-            ConvocEmbed.title = "Convocation"
-            ConvocEmbed.colour = 0x3498db
-            ConvocEmbed.set_thumbnail(url=member.avatar_url)
-            ConvocEmbed.description = "Vous avez été convoqué par l'administration du serveur {0} pour la raison qui suit. Vous êtes prié de vous rendre sur le serveur dans les plus brefs délais et de vous mettre en contact avec un des administrateurs ou des modérateurs".format(ctx.message.server.name)
-            ConvocEmbed.add_field(name = 'Raison', value = reason)
-            ConvocEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
+                ConvocEmbed = discord.Embed()
+                ConvocEmbed.title = "Convocation"
+                ConvocEmbed.colour = 0x3498db
+                ConvocEmbed.set_thumbnail(url=member.avatar_url)
+                ConvocEmbed.description = "Vous avez été convoqué par l'administration du serveur {0} pour la raison qui suit. Vous êtes prié de vous rendre sur le serveur dans les plus brefs délais et de vous mettre en contact avec un des administrateurs ou des modérateurs".format(ctx.message.server.name)
+                ConvocEmbed.add_field(name = 'Raison', value = reason)
+                ConvocEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
 
-            await self.bot.delete_message(tmp)
-            await self.bot.send_message(member, embed=ConvocEmbed)
-            await self.bot.send_message(bot.get_channel('298029242871185408'), "@here Une convocation a été envoyée à {0} par {1}, raison : {2}".format(member.mention, ctx.message.author.mention, reason))
+                server = ctx.message.server
+                Channels = server.channels
+                End = []
+
+                Return = False
+
+                for chan in list(Channels):
+                    Name = str(chan.name)
+                    Type = str(chan.type)
+                    if "moderation" in str(chan.name):
+                        if Type is "text":
+                            ModChan = chan
+                            Return = True
+
+                if Return is not True:
+                    ModChan = await self.bot.create_channel(server, 'moderation', type=discord.ChannelType.text)
+
+                await self.bot.delete_message(tmp)
+                await self.bot.send_message(member, embed=ConvocEmbed)
+                await self.bot.send_message(ModChan, "@here Une convocation a été envoyée à {0} par {1}, raison : {2}".format(member.mention, ctx.message.author.mention, reason))
 
         else:
             await self.bot.say("```\nVous n'avez pas la permission de convoquer un utilisateur\n```")
@@ -995,11 +1014,30 @@ class Messages:
         await self.bot.send_message(user, mess)
         print('[FTS] Message sent to {0.name} : {1}'.format(user, mess))
 
-    @commands.command(pass_context=True, no_pm=False)
+    @commands.command(pass_context=True, no_pm=True)
     async def report(self, ctx, user: discord.Member, *, reason: str):
         """Reporte un utilisateur au staff"""
+        
         await self.bot.delete_message(ctx.message)
-        await self.bot.send_message(bot.get_channel('298029242871185408'), "{0} a été report par {1}, raison : {2}, @here".format(user.mention, ctx.message.author.mention, reason))
+
+        server = ctx.message.server
+        Channels = server.channels
+        End = []
+
+        Return = False
+
+        for chan in list(Channels):
+            Name = str(chan.name)
+            Type = str(chan.type)
+            if "moderation" in str(chan.name):
+                if Type is "text":
+                    ModChan = chan
+                    Return = True
+
+        if Return is not True:
+            ModChan = await self.bot.create_channel(server, 'moderation', type=discord.ChannelType.text)
+
+        await self.bot.send_message(ModChan, "{0} a été report par {1}, raison : {2}, @here".format(user.mention, ctx.message.author.mention, reason))
         print('[FTS] {0} has been reported by {1}'.format(user, ctx.message.author))
 
     @commands.command(pass_context=True, no_pm=False)
