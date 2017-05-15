@@ -241,23 +241,6 @@ def msToHourConverter(ms:int):
 
 #####################################################################################################################################################
 
-def dateConverter(date:str):
-	"""Convertit le format de lecture d'une date"""
-	date = str(date)
-
-	date2 = date.split('-')
-	date3 = date2[2]
-	date4 = date3.split(' ')
-	date5 = date4[1]
-	date6 = date5.split('.')
-	date7 = date6[0]
-	date8 = date7.split(':')
-
-	FinalDate = '{0}/{1}/{2} à {3}'.format(date4[0], date2[1], date2[0], date6[0])
-	return FinalDate
-
-#####################################################################################################################################################
-
 def getFreeChamps():
 
 	request = requests.get("https://euw1.api.riotgames.com/lol/platform/v3/champions?freeToPlay=true&api_key=" + ApiKey)

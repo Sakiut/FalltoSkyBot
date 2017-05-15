@@ -827,8 +827,8 @@ class Admin:
 
             try:
                 RolesList = get_user_roles(member)
-                createdAt = lol.dateConverter(member.created_at)
-                joinedAt = lol.dateConverter(member.joined_at)
+                createdAt = dateConverter(member.created_at)
+                joinedAt = dateConverter(member.joined_at)
                 Statut = str(member.status)
                 StatutFinal = Statut.capitalize()
 
@@ -869,10 +869,14 @@ class Admin:
         ServerEmbed.add_field(name = "Server ID", value = server.id)
         ServerEmbed.add_field(name = "Owner's Name", value = server.owner.name)
         ServerEmbed.add_field(name = "Owner's ID", value = server.owner.id)
+        ServerEmbed.add_field(name = "Text Channels", value = str(len(getTextChannels(server))))
+        ServerEmbed.add_field(name = "Voice Channels", value = str(len(getVoiceChannels(server))))
         ServerEmbed.add_field(name = "Users", value = server.member_count)
         ServerEmbed.add_field(name = "Verification level", value = VerifLevel.upper())
+        ServerEmbed.add_field(name = "Roles Count", value = str(len(server.role_hierarchy)))
         ServerEmbed.add_field(name = "Region", value = formatServerRegion(server.region))
-        ServerEmbed.add_field(name = "Creation Date", value = lol.dateConverter(server.created_at))
+        ServerEmbed.add_field(name = "Creation Date", value = dateConverter(server.created_at))
+        ServerEmbed.add_field(name = "Emotes Count", value = str(len(server.emojis)))
         ServerEmbed.add_field(name = "Roles", value = formatServerRoles(server.role_hierarchy), inline=False)
         ServerEmbed.add_field(name = "Emojis", value = formatEmojis(server.emojis), inline = False)
         ServerEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
@@ -905,7 +909,7 @@ class Admin:
                 ConvocEmbed.title = "Convocation"
                 ConvocEmbed.colour = 0x3498db
                 ConvocEmbed.set_thumbnail(url=member.avatar_url)
-                ConvocEmbed.description = "Vous avez été convoqué par l'administration du serveur {0} pour la raison qui suit. Vous êtes prié de vous rendre sur le serveur dans les plus brefs délais et de vous mettre en contact avec un des administrateurs ou des modérateurs".format(ctx.message.server.name)
+                ConvocEmbed.description = "Vous avez été convoqué par l'administration du serveur **{0}** pour la raison qui suit. Vous êtes prié de vous rendre sur le serveur dans les plus brefs délais et de vous mettre en contact avec un des administrateurs ou des modérateurs".format(ctx.message.server.name)
                 ConvocEmbed.add_field(name = 'Raison', value = reason)
                 ConvocEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
 

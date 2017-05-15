@@ -220,7 +220,7 @@ def getLDIcon(pseudo):
 
 #####################################################################################################################################################
 
-def getTextChannels(server:discord.Server):
+def getTextChannels(server):
 	"""Retourne la liste des channels textuels du serveur"""
 
 	Channels = server.channels
@@ -235,7 +235,7 @@ def getTextChannels(server:discord.Server):
 
 #####################################################################################################################################################
 
-def getVoiceChannels(server:discord.Server):
+def getVoiceChannels(server):
 	"""Retourne la liste des channels vocaux du serveur"""
 
 	Channels = server.channels
@@ -247,5 +247,22 @@ def getVoiceChannels(server:discord.Server):
 			End.append(chan.name)
 
 	return End
+
+#####################################################################################################################################################
+
+def dateConverter(date:str):
+	"""Convertit le format de lecture d'une date"""
+	date = str(date)
+
+	date2 = date.split('-')
+	date3 = date2[2]
+	date4 = date3.split(' ')
+	date5 = date4[1]
+	date6 = date5.split('.')
+	date7 = date6[0]
+	date8 = date7.split(':')
+
+	FinalDate = '{0}/{1}/{2} à {3}'.format(date4[0], date2[1], date2[0], date6[0])
+	return FinalDate
 
 #####################################################################################################################################################
