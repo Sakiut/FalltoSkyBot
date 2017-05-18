@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 from libraries.perms import *
 from libraries.library import *
+from libraries import anilist
 from libraries import lol
 from libraries.lol import msToHourConverter
 
@@ -28,18 +29,18 @@ if not discord.opus.is_loaded():
 print('[FTS] Connecting...')
 
 freshestMemes = [
-"mem/meme1.jpeg",
-"mem/meme2.jpeg",
-"mem/meme3.jpeg",
-"mem/meme6.jpeg",
-"mem/meme7.jpeg",
-"mem/meme8.jpeg",
-"mem/meme9.jpeg",
-"mem/meme10.jpeg",
-"mem/meme11.jpeg",
-"mem/meme12.jpeg",
-"mem/meme14.jpeg",
-"mem/meme15.jpeg"
+    "mem/meme1.jpeg",
+    "mem/meme2.jpeg",
+    "mem/meme3.jpeg",
+    "mem/meme6.jpeg",
+    "mem/meme7.jpeg",
+    "mem/meme8.jpeg",
+    "mem/meme9.jpeg",
+    "mem/meme10.jpeg",
+    "mem/meme11.jpeg",
+    "mem/meme12.jpeg",
+    "mem/meme14.jpeg",
+    "mem/meme15.jpeg"
 ]
 
 class VoiceEntry:
@@ -91,6 +92,77 @@ class VoiceState:
             await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
             self.current.player.start()
             await self.play_next_song.wait()
+
+class Anime:
+    """Animes related Commands"""
+
+    def __init__(self,bot):
+
+        self.bot = bot
+        self.voice_states = {}
+        self.token = None
+        self.params = {
+            "grant_type":"client_credentials",
+            "client_id": getAniClientID(),
+            "client_secret": getAniClientSecret()
+        }
+
+    @commands.command(pass_context=True, no_pm=False)
+    async def anime(self, ctx, *, anime:str):
+        """Get anime informations"""
+
+        await self.bot.delete_message(ctx.message)
+        tmp = await self.bot.say('Processing request')
+        
+        if self.token == None:
+            self.token = anilist.auth(self.params)
+
+        data = anilist.getAnimeInfo(anime, self.token)
+
+        AnimeEmbed = discord.Embed()
+        AnimeEmbed.title = str(data['title_english']) + " | " + str(data['title_japanese']) + " (" + str(data['id']) + ")"
+        AnimeEmbed.colour = 0x3498db
+        AnimeEmbed.set_thumbnail(url=data["image_url_lge"])
+        AnimeEmbed.add_field(name = "Type", value = data["type"])
+        AnimeEmbed.add_field(name = "Episodes", value = data['total_episodes'])
+        AnimeEmbed.add_field(name = "Source", value = data['source'])
+        AnimeEmbed.add_field(name = "Status", value = data['airing_status'])
+        AnimeEmbed.add_field(name = "Genre(s)", value = anilist.getAnimeGenres(data), inline = False)
+        AnimeEmbed.add_field(name = "Episode Length", value = str(data['duration']) + " mins/ep")
+        AnimeEmbed.add_field(name = "Score", value = str(data['average_score']) + " / 100")
+        AnimeEmbed.add_field(name = "Synopsis", value = anilist.formatAnimeDescription(data), inline = False)
+        AnimeEmbed.set_footer(text = anilist.formatAnimeDate(data))
+
+        await self.bot.delete_message(tmp)
+        await self.bot.say(embed=AnimeEmbed)
+
+    @commands.command(pass_context=True, no_pm=False)
+    async def manga(self, ctx, *, manga:str):
+        """Get manga informations"""
+
+        await self.bot.delete_message(ctx.message)
+        tmp = await self.bot.say('Processing request')
+
+        if self.token == None:
+            self.token = anilist.auth(self.params)
+
+        data = anilist.getMangaInfo(manga, self.token)
+
+        MangaEmbed = discord.Embed()
+        MangaEmbed.title = str(data['title_english']) + " | " + str(data['title_japanese']) + "\n(" + str(data['id']) + ")"
+        MangaEmbed.colour = 0x3498db
+        MangaEmbed.set_thumbnail(url=data['image_url_lge'])
+        MangaEmbed.add_field(name = 'Type', value = data['type'])
+        MangaEmbed.add_field(name = 'Volumes', value = data['total_volumes'])
+        MangaEmbed.add_field(name = 'Chapters', value = data['total_chapters'])
+        MangaEmbed.add_field(name = 'Status', value = data["publishing_status"])
+        MangaEmbed.add_field(name = 'Genre(s)', value = anilist.getAnimeGenres(data), inline = False)
+        MangaEmbed.add_field(name = 'Score', value = str(data['average_score']) + " / 100")
+        MangaEmbed.add_field(name = "Synopsis", value = anilist.formatAnimeDescription(data), inline = False)
+        MangaEmbed.set_footer(text = anilist.formatAnimeDate(data))
+
+        await self.bot.delete_message(tmp)
+        await self.bot.say(embed=MangaEmbed)
 
 class LeagueOfLegends:
     """Commandes reliées à League of Legends"""
@@ -748,50 +820,52 @@ class Admin:
             tmp = await self.bot.say("Récupération des permissions...")
 
             perms = [
-            get_perm_admin(member),
-            get_perm_create_instant_invite(member),
-            get_perm_kick_members(member),
-            get_perm_ban_members(member),
-            get_perm_manage_channels(member),
-            get_perm_manage_server(member),
-            get_perm_add_reactions(member),
-            get_perm_send_tts_messages(member),
-            get_perm_manage_messages(member),
-            get_perm_mute(member),
-            get_perm_deafen(member),
-            get_perm_send_embed_links(member),
-            get_perm_attach_files(member),
-            get_perm_mention_everyone(member),
-            get_perm_external_emojis(member),
-            get_perm_change_nickname(member),
-            get_perm_manage_nicknames(member),
-            get_perm_manage_roles(member),
-            get_perm_manage_webhooks(member),
-            get_perm_manage_emojis(member),
-            get_perm_view_audit_logs(member)]
+                get_perm_admin(member),
+                get_perm_create_instant_invite(member),
+                get_perm_kick_members(member),
+                get_perm_ban_members(member),
+                get_perm_manage_channels(member),
+                get_perm_manage_server(member),
+                get_perm_add_reactions(member),
+                get_perm_send_tts_messages(member),
+                get_perm_manage_messages(member),
+                get_perm_mute(member),
+                get_perm_deafen(member),
+                get_perm_send_embed_links(member),
+                get_perm_attach_files(member),
+                get_perm_mention_everyone(member),
+                get_perm_external_emojis(member),
+                get_perm_change_nickname(member),
+                get_perm_manage_nicknames(member),
+                get_perm_manage_roles(member),
+                get_perm_manage_webhooks(member),
+                get_perm_manage_emojis(member),
+                get_perm_view_audit_logs(member)
+            ]
 
             titles = [
-            "Permissions administrateur",
-            "Créer invitations",
-            "Éjecter les membres",
-            "Bannir les membres",
-            "Gérer les channels",
-            "Gérer le serveur",
-            "Ajouter des réactions",
-            "Envoyer des messages tts",
-            "Gérer les messages",
-            "Rendre muet",
-            "Rendre sourd",
-            "Envoyer des messages Embed",
-            "Envoyer des pièces jointes",
-            "Mentionner @everyone",
-            "Utiliser des emojis externes au serveur",
-            "Changer son pseudo",
-            "Gérer les pseudos",
-            "Gérer les roles",
-            "Gérer les WebHooks",
-            "Gérer les Emojis",
-            "Voir les logs"]
+                "Permissions administrateur",
+                "Créer invitations",
+                "Éjecter les membres",
+                "Bannir les membres",
+                "Gérer les channels",
+                "Gérer le serveur",
+                "Ajouter des réactions",
+                "Envoyer des messages tts",
+                "Gérer les messages",
+                "Rendre muet",
+                "Rendre sourd",
+                "Envoyer des messages Embed",
+                "Envoyer des pièces jointes",
+                "Mentionner @everyone",
+                "Utiliser des emojis externes au serveur",
+                "Changer son pseudo",
+                "Gérer les pseudos",
+                "Gérer les roles",
+                "Gérer les WebHooks",
+                "Gérer les Emojis",
+                "Voir les logs"
+            ]
 
             MsgBase = ctx.message.author.mention + " Voici les permissions de " + member.mention + " : ```scheme\n"
             Msg = MsgBase
@@ -1389,6 +1463,7 @@ bot.add_cog(Admin(bot))
 bot.add_cog(Vote(bot))
 bot.add_cog(Jeux(bot))
 bot.add_cog(LeagueOfLegends(bot))
+bot.add_cog(Anime(bot))
 
 @bot.event
 async def on_member_join(member):

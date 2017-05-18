@@ -83,6 +83,34 @@ def getApiKey():
 
 #####################################################################################################################################################
 
+def getAniClientID():
+
+	with open(fileName) as f: lines = f.read().splitlines()
+
+	for line in lines:
+		if line.startswith('anilistClientID='):
+			getLine = line
+			Line = getLine.split('=')
+			ClientID = Line[1]
+
+	return ClientID
+
+#####################################################################################################################################################
+
+def getAniClientSecret():
+
+	with open(fileName) as f: lines = f.read().splitlines()
+
+	for line in lines:
+		if line.startswith('anilistClientSecret='):
+			getLine = line
+			Line = getLine.split('=')
+			ClientSecret = Line[1]
+
+	return ClientSecret
+
+#####################################################################################################################################################
+
 def getServerIP():
 	"""Récupère l'IP depuis le fichier `config.txt`"""
 
