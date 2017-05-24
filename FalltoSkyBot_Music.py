@@ -26,6 +26,14 @@ if not discord.opus.is_loaded():
     # note that on windows this DLL is automatically provided for you
     discord.opus.load_opus('opus')
 
+import logging
+
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
+
 print('[FTS] Connecting...')
 
 freshestMemes = [
@@ -111,58 +119,87 @@ class Anime:
     async def anime(self, ctx, *, anime:str):
         """Get anime informations"""
 
-        await self.bot.delete_message(ctx.message)
-        tmp = await self.bot.say('Processing request')
-        
-        if self.token == None:
-            self.token = anilist.auth(self.params)
+        try:
+            await self.bot.delete_message(ctx.message)
+            tmp = await self.bot.say('Processing request')
+            
+            if self.token == None:
+                self.token = anilist.auth(self.params)
 
-        data = anilist.getAnimeInfo(anime, self.token)
+            data = anilist.getAnimeInfo(anime, self.token)
 
-        AnimeEmbed = discord.Embed()
-        AnimeEmbed.title = str(data['title_english']) + " | " + str(data['title_japanese']) + " (" + str(data['id']) + ")"
-        AnimeEmbed.colour = 0x3498db
-        AnimeEmbed.set_thumbnail(url=data["image_url_lge"])
-        AnimeEmbed.add_field(name = "Type", value = data["type"])
-        AnimeEmbed.add_field(name = "Episodes", value = data['total_episodes'])
-        AnimeEmbed.add_field(name = "Source", value = data['source'])
-        AnimeEmbed.add_field(name = "Status", value = data['airing_status'])
-        AnimeEmbed.add_field(name = "Genre(s)", value = anilist.getAnimeGenres(data), inline = False)
-        AnimeEmbed.add_field(name = "Episode Length", value = str(data['duration']) + " mins/ep")
-        AnimeEmbed.add_field(name = "Score", value = str(data['average_score']) + " / 100")
-        AnimeEmbed.add_field(name = "Synopsis", value = anilist.formatAnimeDescription(data), inline = False)
-        AnimeEmbed.set_footer(text = anilist.formatAnimeDate(data))
+            AnimeEmbed = discord.Embed()
+            AnimeEmbed.title = str(data['title_english']) + " | " + str(data['title_japanese']) + " (" + str(data['id']) + ")"
+            AnimeEmbed.colour = 0x3498db
+            AnimeEmbed.set_thumbnail(url=data["image_url_lge"])
+            AnimeEmbed.add_field(name = "Type", value = data["type"])
+            AnimeEmbed.add_field(name = "Episodes", value = data['total_episodes'])
+            AnimeEmbed.add_field(name = "Source", value = data['source'])
+            AnimeEmbed.add_field(name = "Status", value = data['airing_status'])
+            AnimeEmbed.add_field(name = "Genre(s)", value = anilist.getAnimeGenres(data), inline = False)
+            AnimeEmbed.add_field(name = "Episode Length", value = str(data['duration']) + " mins/ep")
+            AnimeEmbed.add_field(name = "Score", value = str(data['average_score']) + " / 100")
+            AnimeEmbed.add_field(name = "Synopsis", value = anilist.formatAnimeDescription(data), inline = False)
+            AnimeEmbed.set_footer(text = anilist.formatAnimeDate(data))
 
-        await self.bot.delete_message(tmp)
-        await self.bot.say(embed=AnimeEmbed)
+            await self.bot.delete_message(tmp)
+            await self.bot.say(embed=AnimeEmbed)
+
+        except AttributeError:
+            await self.bot.delete_message(tmp)
+            await self.bot.say("```py\nAnime not found\n```")
+        except IndexError:
+            await self.bot.delete_message(tmp)
+            await self.bot.say("```py\nWe got a problem with this anime, please try another\n```")
+        except Exception as e:
+            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
+            await self.bot.delete_message(tmp)
+            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 
     @commands.command(pass_context=True, no_pm=False)
     async def manga(self, ctx, *, manga:str):
         """Get manga informations"""
 
-        await self.bot.delete_message(ctx.message)
-        tmp = await self.bot.say('Processing request')
+        try:
+            await self.bot.delete_message(ctx.message)
+            tmp = await self.bot.say('Processing request')
 
-        if self.token == None:
-            self.token = anilist.auth(self.params)
+            if self.token == None:
+                self.token = anilist.auth(self.params)
 
-        data = anilist.getMangaInfo(manga, self.token)
+            data = anilist.getMangaInfo(manga, self.token)
 
-        MangaEmbed = discord.Embed()
-        MangaEmbed.title = str(data['title_english']) + " | " + str(data['title_japanese']) + "\n(" + str(data['id']) + ")"
-        MangaEmbed.colour = 0x3498db
-        MangaEmbed.set_thumbnail(url=data['image_url_lge'])
-        MangaEmbed.add_field(name = 'Type', value = data['type'])
-        MangaEmbed.add_field(name = 'Volumes', value = data['total_volumes'])
-        MangaEmbed.add_field(name = 'Chapters', value = data['total_chapters'])
-        MangaEmbed.add_field(name = 'Status', value = data["publishing_status"])
-        MangaEmbed.add_field(name = 'Genre(s)', value = anilist.getAnimeGenres(data), inline = False)
-        MangaEmbed.add_field(name = 'Score', value = str(data['average_score']) + " / 100")
-        MangaEmbed.add_field(name = "Synopsis", value = anilist.formatAnimeDescription(data), inline = False)
-        MangaEmbed.set_footer(text = anilist.formatAnimeDate(data))
+            if data['total_volumes'] == 0:
+                data['total_volumes'] = '-'
 
-        await self.bot.delete_message(tmp)
-        await self.bot.say(embed=MangaEmbed)
+            if data['total_chapters'] == 0:
+                data['total_chapters'] = '-'
+
+            MangaEmbed = discord.Embed()
+            MangaEmbed.title = str(data['title_english']) + " | " + str(data['title_japanese']) + "\n(" + str(data['id']) + ")"
+            MangaEmbed.colour = 0x3498db
+            MangaEmbed.set_thumbnail(url=data['image_url_lge'])
+            MangaEmbed.add_field(name = 'Type', value = data['type'])
+            MangaEmbed.add_field(name = 'Volumes', value = data['total_volumes'])
+            MangaEmbed.add_field(name = 'Chapters', value = data['total_chapters'])
+            MangaEmbed.add_field(name = 'Status', value = data["publishing_status"])
+            MangaEmbed.add_field(name = 'Genre(s)', value = anilist.getAnimeGenres(data), inline = False)
+            MangaEmbed.add_field(name = 'Score', value = str(data['average_score']) + " / 100")
+            MangaEmbed.add_field(name = "Synopsis", value = anilist.formatAnimeDescription(data), inline = False)
+            MangaEmbed.set_footer(text = anilist.formatAnimeDate(data))
+
+            await self.bot.delete_message(tmp)
+            await self.bot.say(embed=MangaEmbed)
+        except AttributeError:
+            await self.bot.delete_message(tmp)
+            await self.bot.say("```py\nManga not found\n```")
+        except IndexError:
+            await self.bot.delete_message(tmp)
+            await self.bot.say("```py\nWe got a problem with this manga, please try another\n```")
+        except Exception as e:
+            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
+            await self.bot.delete_message(tmp)
+            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 
 class LeagueOfLegends:
     """Commandes reliées à League of Legends"""
@@ -1033,7 +1070,7 @@ class Admin:
         """Déconnecte le bot - Bot Master uniquement"""
         requester = ctx.message.author
         await self.bot.delete_message(ctx.message)
-        if requester.name == 'Sakiut25':
+        if requester.id == '187565415512276993':
             await self.bot.send_message(bot.get_channel('283397577552953344'), "```Déconnection du bot```")
             print('[FTS] Déconnexion...')
             bot.logout()
