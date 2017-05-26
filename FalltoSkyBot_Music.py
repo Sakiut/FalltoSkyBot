@@ -1181,10 +1181,10 @@ class Messages:
 
 
     @commands.command(pass_context=True, no_pm=True)
-    async def purge(self, ctx, limit=100):
+    async def purge(self, ctx, limit=10):
         """Supprime le nombre de messages spécifié
 
-        100 Messages seront supprimés par défaut
+        10 Messages seront supprimés par défaut
 
         Cette commande ne peut être utilisée que par les utilisateurs ayant la permission de gérer les messages
         """
@@ -1212,22 +1212,26 @@ class Messages:
         """
         await self.bot.delete_message(ctx.message)
 
-        if ctx.message.author.server_permissions.manage_messages == True:
-            print('[FTS] Proceding purge...')
-            counter = 0
-            async for log in self.bot.logs_from(ctx.message.channel, limit):
-                if log.author == user:
-                    counter += 1
-                    await self.bot.delete_message(log)
+        member = ctx.message.author
+        if member.server_permissions.manage_messages == True:
 
-            FeedBack = await self.bot.say("{2} ```Messages de {0} parmi les {1} derniers messages supprimés```".format(user.name, limit, ctx.message.author.mention))
+            def compare(m):
+                return m.author == user 
+
+            print('[FTS] Proceding purge...')
+
+            deleted = await self.bot.purge_from(ctx.message.channel, limit = limit, check = compare)
+
+            FeedBack = await self.bot.say("```{2} messages de {0} parmi les {1} derniers messages supprimés```".format(user.name, limit, len(deleted)))
             await asyncio.sleep(10)
             await self.bot.delete_message(FeedBack)
+
             print('[FTS] Purge done')
-            print('[FTS] Deleted {0} messages'.format(counter))
+            print('[FTS] Deleted {0} messages'.format(limit))
         else:
             await self.bot.delete_message(ctx.message)
             await self.bot.say("Vous n'avez pas l'autorisation de gérer les messages")
+            print('[FTS] Purge : Command aborted : User do not have manage_messages permission')
 
     @commands.command(pass_context=True, no_pm=False)
     async def addme(self, ctx):
