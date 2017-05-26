@@ -1,5 +1,8 @@
 # FalltoSkyBot
 
+[![PyPI](https://img.shields.io/pypi/v/discord.py.svg)](https://pypi.python.org/pypi/discord.py/)
+[![PyPI](https://img.shields.io/pypi/pyversions/discord.py.svg)](https://pypi.python.org/pypi/discord.py/)
+
 Le Fall to Sky Bot est un bot fonctionnant sous python 3.5 conçu pour administrer le serveur du même nom. Il a de multiples fonctionnalités
 et est toujours en cours de développement. Il vient de se placer sous le sigle du Open-Source et sa publication est entamée.
 
