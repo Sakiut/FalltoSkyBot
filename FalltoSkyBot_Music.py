@@ -1536,6 +1536,21 @@ async def on_member_unban(server, member):
     print('[FTS] {0.name} has been unbanned of the server'.format(member))
 
 @bot.event
+async def on_server_emojis_update(before, after):
+    before = set(before)
+    after = set(after)
+
+    n_e = after - before
+    n_e = list(n_e)
+
+    for e in n_e:
+        Emoji = "<:{0}:{1}>".format(e.name, e.id)
+        Embed = discord.Embed()
+        Embed.colour = 0x3498db
+        Embed.description = Emoji
+        await bot.send_message(e.server, "Nouvel emoji !", embed = Embed)
+
+@bot.event
 async def on_ready():
     print('--------------------------')
     print('[FTS] Logged in as')
