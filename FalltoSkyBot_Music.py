@@ -1107,7 +1107,7 @@ class Admin:
         i = 0
         bar = ""
         pt = ".........."
-        while i <= 10:
+        while i < 10:
             i += 1
             bar += "█"
             pt = pt[:-1]
