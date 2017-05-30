@@ -1049,23 +1049,40 @@ class Admin:
             await self.bot.say("```\nVous n'avez pas la permission de convoquer un utilisateur\n```")
 
     @commands.command(pass_context=True, no_pm=False)
-    async def rules(self, ctx, *, user:discord.Member=None):
-        """Donne les règles du serveur"""
+    async def rules(self, ctx, line=None, *, user:discord.Member=None):
+        """Envoie le règlement du serveur à un joueur
+        Si aucun joueur n'est spécifié, le règlement est envoyé dans le chat. 
+        On peut spécifier une ligne précise du règlement."""
         try:
-            if user == None:
-                user = ctx.message.author
-
             rules = getServerRules()
-            await self.bot.send_message(user, rules)
+            rulesLines = getSplittedRules()
             await self.bot.delete_message(ctx.message)
-            tmp = await self.bot.say("Message sent")
-            await asyncio.sleep(10)
-            await self.bot.delete_message(tmp)
+            if ctx.message.author.server_permissions.manage_messages == False: 
+                user = ctx.message.author
+                line = None
+            if user == None:
+                if line == None:
+                    await self.bot.say(rules)
+                else:
+                    line = int(line)
+                    await self.bot.say("*Extrait du règlement :*" + rulesLines[line])
+            else:
+                if line == None:
+                    await self.bot.send_message(user, rules)
+                else:
+                    line = int(line)
+                    await self.bot.send_message(user, "*Extrait du règlement :*" + rulesLines[line])
+                tmp = await self.bot.say("Message sent")
+                await asyncio.sleep(10)
+                await self.bot.delete_message(tmp)
+        except IndexError:
+            await self.bot.say("```Cette règle n'existe pas```")
         except Exception as e:
+            print(e)
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=False)
     async def disconnect(self, ctx):
         """Déconnecte le bot - Bot Master uniquement"""
         requester = ctx.message.author
@@ -1081,6 +1098,24 @@ class Admin:
             exit()
         else:
             await self.bot.say("Vous n'êtes pas le Bot Master")
+
+    @commands.command(pass_context=True, no_pm=False)
+    async def test(self, ctx):
+        """Teste le bot [10 secondes]"""
+        await self.bot.delete_message(ctx.message)
+        tmp = await self.bot.say("Test en cours :\n```\n|..........|\n```")
+        i = 0
+        bar = ""
+        pt = ".........."
+        while i <= 10:
+            i += 1
+            bar += "█"
+            pt = pt.rstrip(".")
+            await self.bot.edit_message(tmp, "Test en cours :\n```\n|"+ bar + pt +"|\n```")
+            await asyncio.sleep(1)
+        await self.bot.edit_message(tmp, "Test terminé")
+        await asyncio.sleep(5)
+        await self.bot.delete_message(tmp)
 
 class Messages:
     """Commandes Textuelles"""
