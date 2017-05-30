@@ -1110,10 +1110,10 @@ class Admin:
         while i <= 10:
             i += 1
             bar += "█"
-            pt = pt.rstrip(".")
+            pt = pt[:-1]
             await self.bot.edit_message(tmp, "Test en cours :\n```\n|"+ bar + pt +"|\n```")
             await asyncio.sleep(1)
-        await self.bot.edit_message(tmp, "Test terminé")
+        await self.bot.edit_message(tmp, "```Test terminé```")
         await asyncio.sleep(5)
         await self.bot.delete_message(tmp)
 
