@@ -294,3 +294,16 @@ def dateConverter(date:str):
 	return FinalDate
 
 #####################################################################################################################################################
+
+def getSplittedRules():
+	fileName = './rules.txt'
+	with open(fileName) as f: lines = f.readlines()
+
+	Split = []
+	for line in lines:
+		if line.startswith('[>]'):
+			Split.append(line)
+
+	return Split
+
+#####################################################################################################################################################
