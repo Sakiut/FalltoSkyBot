@@ -1,34 +1,37 @@
-Bienvenue sur le serveur de la Communauté Multigaming **Fall to Sky** !!
+Bienvenue sur le serveur de la CommunautÃ© Multigaming **Fall to Sky** !!
 
-Afin d'avoir une bonne entente et une bonne ambiance au sein de ce discord, nous avons institué des règles élementaires.
+Afin d'avoir une bonne entente et une bonne ambiance au sein de ce discord, nous avons instituÃ© des rÃ¨gles Ã©lementaires.
 
-Quelques règles de bonne conduite :
+Quelques rÃ¨gles de bonne conduite :
 ```py
 [>](1) Soyez respectueux.
-[>](2) Ne soyez pas hors-sujet et prenez en compte ce que les gens disent avant de débarquer avec un hors-sujet total.
-[>](3) Ne soyez pas haineux. On est ici pour passer un bon moment. Twitter est un meilleur endroit pour raconter comment vous détestez tout le monde.
-[>](4) Le piratage c'est pas très bien. Donc n'en parlez pas. ;)
-[>](5) On ne tolère aucun écart de comportement envers les femmes, les filles et les e-girls. 
+[>](2) Ne soyez pas hors-sujet et prenez en compte ce que les gens disent avant de dÃ©barquer avec un hors-sujet total.
+[>](3) Ne soyez pas haineux. On est ici pour passer un bon moment. Twitter est un meilleur endroit pour raconter comment vous dÃ©testez tout le monde.
+[>](4) Le piratage c'est pas trÃ¨s bien. Donc n'en parlez pas. ;)
+[>](5) On ne tolÃ¨re aucun Ã©cart de comportement envers les femmes, les filles et les e-girls. 
 ```
 
 Ce qui est interdit :
 ```py
-[>](1) Spam des entrées/sorties des chans vocaux.
-[>](2) Ping Modérateurs et utilisation de .report abusifs (sans raison)
-[>](3) Tout ce qui est nsfw ou images non appropriés pour les plus jeunes.
+[>](1) Spam des entrÃ©es/sorties des chans vocaux.
+[>](2) Ping ModÃ©rateurs et utilisation de .report abusifs (sans raison)
+[>](3) Tout ce qui est nsfw ou images non appropriÃ©s pour les plus jeunes.
 [>](4) Le spam et autres pollutions de chan.
-[>](5) L'utilisation de commandes de bots autre que dans #bots à des fins inutiles.
-[>](6) Les insultes gratuites et le harcèlement envers d'autres membres de la communauté.
+[>](5) L'utilisation de commandes de bots autre que dans #bots Ã  des fins inutiles.
+[>](6) Les insultes gratuites et le harcÃ¨lement envers d'autres membres de la communautÃ©.
 [>](7) Les noms insultants.
-[>](8) Les spoils de séries, jeux, films et autres produits culturels.
-[>](9) Interdiction aux pubs pour d'autres Discord personels. (Les liens vers des Discord d'utilité publique comme r/Overwatch ou Discord API sont autorisés)
-[>](10) L'esquive de sanction (via sortie et entrée du Discord).
+[>](8) Les spoils de sÃ©ries, jeux, films et autres produits culturels.
+[>](9) Interdiction aux pubs pour d'autres Discord personels. (Les liens vers des Discord d'utilitÃ© publique comme r/Overwatch ou Discord API sont autorisÃ©s)
+[>](10) L'esquive de sanction (via sortie et entrÃ©e du Discord).
 [>](11) Le multi-compte proxy de ban.
-[>](12) L'usurpation d'identité.
-[>](13) La publicité pour des sites, des chaînes YouTubes personnelles, des serveurs Minecraft personnels,... 
+[>](12) L'usurpation d'identitÃ©.
+[>](13) La publicitÃ© pour des sites, des chaÃ®nes YouTubes personnelles, des serveurs Minecraft personnels,... 
+```
+```scheme
+[>] Aypierre Officiel (C) 2017
 ```
 
-*L'équipe de modération se réserve le droit de rajouter des règles à tout moment.*
+*L'Ã©quipe de modÃ©ration se rÃ©serve le droit de rajouter des rÃ¨gles Ã  tout moment.*
 
 Bien cordialement,
 l'Administration.
