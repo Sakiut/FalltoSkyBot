@@ -655,6 +655,7 @@ class Vote:
         self.VoteMess = None
         self.Requester = None
         self.VoteTitle = None
+        self.Voters = None
 
     @commands.command(pass_context=True, no_pm=True)
     async def votestart(self, ctx, *, subject : str):
@@ -671,6 +672,7 @@ class Vote:
             self.VoteTitle = subject
             self.Requester = ctx.message.author
             self.VoteMess = {'oui': 0,'non': 0}
+            self.Voters = {}
 
             await self.bot.say(embed=VoteEmbed)
 
@@ -690,25 +692,43 @@ class Vote:
             if self.VoteMess != None:
                 if answer == 'oui':
 
-                    oui = self.VoteMess['oui']
-                    oui = int(oui) + 1
-                    self.VoteMess['oui'] = oui
+                    if ctx.message.author.name in self.Voters.keys():
+                        await self.bot.delete_message(ctx.message)
+                        tmp = await self.bot.say('```\nVous avez déjà voté\n```')
+                        await asyncio.sleep(5)
+                        await self.bot.delete_message(tmp)
+                    else:
+                        oui = self.VoteMess['oui']
+                        oui = int(oui) + 1
+                        self.VoteMess['oui'] = oui
 
-                    await self.bot.delete_message(ctx.message)
-                    tmp = await self.bot.say("{0} Votre vote a bien été pris en compte".format(ctx.message.author.mention))
-                    await asyncio.sleep(5)
-                    await self.bot.delete_message(tmp)
+                        filler = {ctx.message.author.name:"Oui"}
+                        self.Voters.update(filler)
+
+                        await self.bot.delete_message(ctx.message)
+                        tmp = await self.bot.say("{0} Votre vote a bien été pris en compte".format(ctx.message.author.mention))
+                        await asyncio.sleep(5)
+                        await self.bot.delete_message(tmp)
 
                 elif answer == 'non':
 
-                    non = self.VoteMess['non']
-                    non = int(non) + 1
-                    self.VoteMess['non'] = non
+                    if ctx.message.author.name in self.Voters.keys():
+                        await self.bot.delete_message(ctx.message)
+                        tmp = await self.bot.say('```\nVous avez déjà voté\n```')
+                        await asyncio.sleep(5)
+                        await self.bot.delete_message(tmp)
+                    else:
+                        non = self.VoteMess['non']
+                        non = int(non) + 1
+                        self.VoteMess['non'] = Non
+                        
+                        filler = {ctx.message.author.name:"Non"}
+                        self.Voters.update(filler)
 
-                    await self.bot.delete_message(ctx.message)
-                    tmp = await self.bot.say("{0} Votre vote a bien été pris en compte".format(ctx.message.author.mention))
-                    await asyncio.sleep(5)
-                    await self.bot.delete_message(tmp)
+                        await self.bot.delete_message(ctx.message)
+                        tmp = await self.bot.say("{0} Votre vote a bien été pris en compte".format(ctx.message.author.mention))
+                        await asyncio.sleep(5)
+                        await self.bot.delete_message(tmp)
 
                 else:
                     raise TypeError("Seulement oui ou non attendus")
@@ -730,6 +750,7 @@ class Vote:
                 VoteEmbed = discord.Embed()
                 VoteEmbed.title = "Vote : " + self.VoteTitle
                 VoteEmbed.colour = 0x3498db
+                VoteEmbed.description = "{} personne(s) ont voté :".format(len(self.Voters))
                 VoteEmbed.add_field(name = 'Oui', value = str(self.VoteMess['oui']))
                 VoteEmbed.add_field(name = 'Non', value = str(self.VoteMess['non']))
                 VoteEmbed.set_footer(text = "Requested by {0}".format(self.Requester.name), icon_url = self.Requester.avatar_url)
@@ -745,20 +766,25 @@ class Vote:
 
     @commands.command(pass_context=True, no_pm=True)
     async def votestop(self, ctx):
+        """Arrête le vote"""
         try:
             if self.VoteMess != None:
-                await self.bot.delete_message(ctx.message)
-                VoteEmbed = discord.Embed()
-                VoteEmbed.title = "Résultats du Vote : " + self.VoteTitle
-                VoteEmbed.colour = 0x3498db
-                VoteEmbed.add_field(name = 'Oui', value = str(self.VoteMess['oui']))
-                VoteEmbed.add_field(name = 'Non', value = str(self.VoteMess['non']))
-                VoteEmbed.set_footer(text = "Requested by {0}".format(self.Requester.name), icon_url = self.Requester.avatar_url)
-                await self.bot.say(embed=VoteEmbed)
-                self.VoteMess = None
-                self.VoteTitle = None
-                self.Requester = None
-                await self.bot.say('```\nVOTE TERMINÉ !\n```')
+                if ctx.message.author == self.Requester:
+                    await self.bot.delete_message(ctx.message)
+                    VoteEmbed = discord.Embed()
+                    VoteEmbed.title = "Résultats du Vote : " + self.VoteTitle
+                    VoteEmbed.colour = 0x3498db
+                    VoteEmbed.description = "{} personne(s) ont voté :".format(len(self.Voters))
+                    VoteEmbed.add_field(name = 'Oui', value = str(self.VoteMess['oui']))
+                    VoteEmbed.add_field(name = 'Non', value = str(self.VoteMess['non']))
+                    VoteEmbed.set_footer(text = "Requested by {0}".format(self.Requester.name), icon_url = self.Requester.avatar_url)
+                    await self.bot.say('```\nVOTE TERMINÉ !\n```', embed=VoteEmbed)
+                    self.VoteMess = None
+                    self.VoteTitle = None
+                    self.Requester = None
+                else:
+                    await self.bot.delete_message(ctx.message)
+                    await self.bot.say("```\nVous n'êtes pas le requêteur du vote\n```")
             else:
                 await self.bot.delete_message(ctx.message)
                 await self.bot.say("```\nAucun vote n'est en cours\n```")
@@ -767,6 +793,28 @@ class Vote:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
             await self.bot.delete_message(ctx.message)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def voters(self, ctx):
+        """Liste des votants et leur vote
+
+        Admins uniquement"""
+        
+        member = ctx.message.author
+        await self.bot.delete_message(ctx.message)
+        
+        fmt = "```\n+--------------------+----------+" + "\n|{0:20}|{1:10}|".format("Voter", "Vote") + "\n+--------------------+----------+"
+        
+        if self.Voters != None:
+            if member.server_permissions.administrator == True:
+                for voter, vote in self.Voters.items():
+                    fmt += "\n|{0:20}|{1:10}|".format(voter, vote)
+                fmt += "\n+--------------------+----------+\n```"
+                await self.bot.say(fmt)
+            else:
+                await self.bot.say("```\nVous n'êtes pas administrateur-e\n```")
+        else:
+            await self.bot.say("```\nAucun vote n'a eu lieu\n```")
 
 class Jeux:
     """Jeux proposés par le bot FtS"""
