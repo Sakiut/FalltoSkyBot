@@ -1,31 +1,30 @@
-Bienvenue sur le serveur de la Communauté Multigaming **Fall to Sky** !!
+﻿Bienvenue sur le serveur de la Communauté Multigaming **Fall to Sky** !!
 
 Afin d'avoir une bonne entente et une bonne ambiance au sein de ce discord, nous avons institué des règles élementaires.
 
 Quelques règles de bonne conduite :
-```py
+```css
 [>](1) Soyez respectueux.
 [>](2) Ne soyez pas hors-sujet et prenez en compte ce que les gens disent avant de débarquer avec un hors-sujet total.
 [>](3) Ne soyez pas haineux. On est ici pour passer un bon moment. Twitter est un meilleur endroit pour raconter comment vous détestez tout le monde.
 [>](4) Le piratage c'est pas très bien. Donc n'en parlez pas. ;)
 [>](5) On ne tolère aucun écart de comportement envers les femmes, les filles et les e-girls. 
 ```
-
 Ce qui est interdit :
-```py
-[>](1) Spam des entrées/sorties des chans vocaux.
-[>](2) Ping Modérateurs et utilisation de .report abusifs (sans raison)
-[>](3) Tout ce qui est nsfw ou images non appropriés pour les plus jeunes.
-[>](4) Le spam et autres pollutions de chan.
-[>](5) L'utilisation de commandes de bots autre que dans #bots à des fins inutiles.
-[>](6) Les insultes gratuites et le harcèlement envers d'autres membres de la communauté.
-[>](7) Les noms insultants.
-[>](8) Les spoils de séries, jeux, films et autres produits culturels.
-[>](9) Interdiction aux pubs pour d'autres Discord personels. (Les liens vers des Discord d'utilité publique comme r/Overwatch ou Discord API sont autorisés)
-[>](10) L'esquive de sanction (via sortie et entrée du Discord).
-[>](11) Le multi-compte proxy de ban.
-[>](12) L'usurpation d'identité.
-[>](13) La publicité pour des sites, des chaînes YouTubes personnelles, des serveurs Minecraft personnels,... 
+```css
+[>](6) Spam des entrées/sorties des chans vocaux.
+[>](7) Ping Modérateurs et utilisation de .report abusifs (sans raison)
+[>](8) Tout ce qui est nsfw ou images non appropriés pour les plus jeunes.
+[>](9) Le spam et autres pollutions de chan.
+[>](10) L'utilisation de commandes de bots autre que dans #bots à des fins inutiles.
+[>](11) Les insultes gratuites et le harcèlement envers d'autres membres de la communauté.
+[>](12) Les noms insultants.
+[>](13) Les spoils de séries, jeux, films et autres produits culturels.
+[>](14) Interdiction aux pubs pour d'autres Discord personels. (Les liens vers des Discord d'utilité publique comme r/Overwatch ou Discord API sont autorisés)
+[>](15) L'esquive de sanction (via sortie et entrée du Discord).
+[>](16) Le multi-compte proxy de ban.
+[>](17) L'usurpation d'identité.
+[>](18) La publicité pour des sites, des chaînes YouTubes personnelles, des serveurs Minecraft personnels,... 
 ```
 ```scheme
 [>] Aypierre Officiel (C) 2017

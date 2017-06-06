@@ -688,26 +688,30 @@ class Vote:
 
         try:
             if self.VoteMess != None:
-                    if answer == 'oui':
+                if answer == 'oui':
 
-                        oui = self.VoteMess['oui']
-                        oui = int(oui) + 1
-                        self.VoteMess['oui'] = oui
+                    oui = self.VoteMess['oui']
+                    oui = int(oui) + 1
+                    self.VoteMess['oui'] = oui
 
-                        await self.bot.delete_message(ctx.message)
-                        await self.bot.say("{0} Votre vote a bien été pris en compte".format(ctx.message.author.mention))
+                    await self.bot.delete_message(ctx.message)
+                    tmp = await self.bot.say("{0} Votre vote a bien été pris en compte".format(ctx.message.author.mention))
+                    await asyncio.sleep(5)
+                    await self.bot.delete_message(tmp)
 
-                    elif answer == 'non':
+                elif answer == 'non':
 
-                        non = self.VoteMess['non']
-                        non = int(non) + 1
-                        self.VoteMess['non'] = non
+                    non = self.VoteMess['non']
+                    non = int(non) + 1
+                    self.VoteMess['non'] = non
 
-                        await self.bot.delete_message(ctx.message)
-                        await self.bot.say("{0} Votre vote a bien été pris en compte".format(ctx.message.author.mention))
+                    await self.bot.delete_message(ctx.message)
+                    tmp = await self.bot.say("{0} Votre vote a bien été pris en compte".format(ctx.message.author.mention))
+                    await asyncio.sleep(5)
+                    await self.bot.delete_message(tmp)
 
-                    else:
-                        raise TypeError("Seulement oui ou non attendus")
+                else:
+                    raise TypeError("Seulement oui ou non attendus")
             else:
                 await self.bot.delete_message(ctx.message)
                 await self.bot.say("```\nAucun vote n'est en cours\n```")
