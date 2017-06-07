@@ -7,6 +7,7 @@ from libraries.perms import *
 from libraries.library import *
 from libraries import anilist
 from libraries import lol
+from libraries import youtube
 from libraries.lol import msToHourConverter
 
 from riotwatcher import RiotWatcher
@@ -1584,6 +1585,50 @@ class Music:
             await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
             print('[FTS] Now playing {} [skips: {}/3]'.format(state.current, skip_count))
 
+class RSS:
+
+    def __init__(self, bot):
+        self.bot = bot
+        self.channel = channel = discord.Object(id='189472786056478720')
+        self.feed = youtube.start()
+
+    @commands.command(pass_context=True, no_pm=True)    
+    async def forceupdate(self, ctx):
+        """[ADMIN] Teste le système d'update de flux RSS"""
+        if ctx.message.author.server_permissions.administrator == True:
+            update = youtube.update(self.feed)
+            if update != "304":
+                entry = youtube.getLastEntry()
+                YTEmbed = discord.Embed()
+                YTEmbed.colour = 0x3498db
+                YTEmbed.title = "Nouvelle vidéo sur la chaîne de Sakiut ! `" + entry['title'] + "`"
+                YTEmbed.description = "Vidéo : " + entry['link'] + "\nChaîne : " + entry['channel'] + "\nPosté le : " + entry['published']
+                YTEmbed.set_thumbnail(url = entry['thumbnail'])
+                YTEmbed.set_footer(text = "Posté par {0}".format(entry['author']))
+                await self.bot.send_message(self.channel, "@everyone", embed = YTEmbed)
+            else:
+                await self.bot.delete_message(ctx.message)
+                await self.bot.say("```Update failed```")
+        else:
+            await self.bot.delete_message(ctx.message)
+            await self.bot.say("```Vous n'avez pas la permission d'utiliser cette commande```")
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def updatelastentry(self, ctx):
+        """[ADMIN] Force la dernière entrée RSS"""
+        if ctx.message.author.server_permissions.administrator == True:
+            entry = youtube.getLastEntry()
+            YTEmbed = discord.Embed()
+            YTEmbed.colour = 0x3498db
+            YTEmbed.title = "Nouvelle vidéo sur la chaîne de Sakiut ! `" + entry['title'] + "`"
+            YTEmbed.description = "Vidéo : " + entry['link'] + "\nChaîne : " + entry['channel'] + "\nPosté le : " + entry['published']
+            YTEmbed.set_thumbnail(url = entry['thumbnail'])
+            YTEmbed.set_footer(text = "Posté par {0}".format(entry['author']))
+            await self.bot.send_message(self.channel, "@everyone", embed = YTEmbed)
+        else:
+            await self.bot.delete_message(ctx.message)
+            await self.bot.say("```Vous n'avez pas la permission d'utiliser cette commande```")
+
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('.'), description="Commandes Bot Fall to Sky")
 bot.add_cog(Messages(bot))
 bot.add_cog(Music(bot))
@@ -1592,6 +1637,26 @@ bot.add_cog(Vote(bot))
 bot.add_cog(Jeux(bot))
 bot.add_cog(LeagueOfLegends(bot))
 bot.add_cog(Anime(bot))
+
+#YT RSS
+async def my_background_task():
+    client = discord.Client()
+    await client.wait_until_ready()
+    channel = discord.Object(id='189472786056478720')
+    feed = youtube.start()
+    while not client.is_closed:
+        update = youtube.update(feed)
+        if update != "304":
+            entry = youtube.getLastEntry()
+            YTEmbed = discord.Embed()
+            YTEmbed.colour = 0x3498db
+            YTEmbed.title = "Nouvelle vidéo sur la chaîne de Sakiut ! `" + entry['title'] + "`"
+            YTEmbed.description = "Vidéo : " + entry['link'] + "\nChaîne : " + entry['channel'] + "\nPosté le : " + entry['published']
+            YTEmbed.set_thumbnail(url = entry['thumbnail'])
+            YTEmbed.set_footer(text = "Posté par {0}".format(entry['author']))
+            await client.send_message(channel, "@everyone", embed = YTEmbed)
+        feed = youtube.start()
+        await asyncio.sleep(300)
 
 @bot.event
 async def on_member_join(member):

@@ -296,8 +296,8 @@ def dateConverter(date:str):
 #####################################################################################################################################################
 
 def getSplittedRules():
-	fileName = './rules.txt'
-	with open(fileName) as f: lines = f.readlines()
+	FileName = './rules.txt'
+	with open(FileName) as f: lines = f.readlines()
 
 	Split = []
 	for line in lines:
@@ -305,5 +305,37 @@ def getSplittedRules():
 			Split.append(line)
 
 	return Split
+
+#####################################################################################################################################################
+
+def getYoutubeID():
+	"""Récupère l'ID YouTube depuis le fichier `config.txt`"""
+
+	with open(fileName) as f: lines = f.read().splitlines()
+
+	for line in lines:
+		if line.startswith('youtubeid='):
+			getLine = line
+			Line = getLine.split('=')
+			yt_id = Line[1]
+
+	return yt_id
+
+#####################################################################################################################################################
+
+def formatRSSdate(date:str):
+	"""2017-06-07T17:20:20+00:00"""
+
+	date = date[:-6]
+	splittedDate = date.split("T")
+	hour = splittedDate[1]
+	Date = splittedDate[0]
+	splittedDate = Date.split("-")
+	year = splittedDate[0]
+	mounth = splittedDate[1]
+	day = splittedDate[2]
+
+	finalDate = "{0}-{1}-{2}, {3}".format(day, mounth, year, hour)
+	return finalDate
 
 #####################################################################################################################################################
