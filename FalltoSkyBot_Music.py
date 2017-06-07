@@ -1637,6 +1637,7 @@ bot.add_cog(Vote(bot))
 bot.add_cog(Jeux(bot))
 bot.add_cog(LeagueOfLegends(bot))
 bot.add_cog(Anime(bot))
+bot.add_cog(RSS(bot))
 
 #YT RSS
 async def my_background_task():
