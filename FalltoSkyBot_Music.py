@@ -1103,34 +1103,44 @@ class Admin:
             await self.bot.say("```\nVous n'avez pas la permission de convoquer un utilisateur\n```")
 
     @commands.command(pass_context=True, no_pm=False)
-    async def rules(self, ctx, line=None, *, user:discord.Member=None):
+    async def rules(self, ctx, line="all", *, user:discord.Member=None):
         """Envoie le règlement du serveur à un joueur
         Si aucun joueur n'est spécifié, le règlement est envoyé dans le chat. 
         On peut spécifier une ligne précise du règlement."""
         try:
             rules = getServerRules()
             rulesLines = getSplittedRules()
+            line = line.lower()
+
             await self.bot.delete_message(ctx.message)
-            if ctx.message.author.server_permissions.manage_messages == False: 
-                user = ctx.message.author
-                line = None
-            if user == None:
-                if line == None:
-                    await self.bot.say(rules)
+
+            try:
+                line = int(line)
+                line -= 1
+            except ValueError as e:
+                if line == "all":
+                    pass
                 else:
-                    line = int(line)
-                    await self.bot.say("*Extrait du règlement :*" + rulesLines[line])
-            else:
-                if line == None:
+                    raise ValueError(e)
+
+            if user == None:
+                user = ctx.message.channel
+
+            if ctx.message.author.server_permissions.manage_messages == True:
+                if line == "all":
                     await self.bot.send_message(user, rules)
                 else:
-                    line = int(line)
-                    await self.bot.send_message(user, "*Extrait du règlement :*" + rulesLines[line])
-                tmp = await self.bot.say("Message sent")
-                await asyncio.sleep(10)
-                await self.bot.delete_message(tmp)
-        except IndexError:
-            await self.bot.say("```Cette règle n'existe pas```")
+                    try:
+                        msg = "*Extrait du règlement :*\n```css\n" + rulesLines[line] + "\n```"
+                    except IndexError as e:
+                        raise IndexError("Cette règle n'existe pas")
+                    await self.bot.send_message(user, msg)
+
+                if type(user) != discord.Channel:
+                    tmp = await self.bot.say("Message sent")
+                    await asyncio.sleep(10)
+                    await self.bot.delete_message(tmp)
+
         except Exception as e:
             print(e)
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
