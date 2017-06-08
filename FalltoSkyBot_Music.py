@@ -1131,7 +1131,10 @@ class Admin:
                     await self.bot.send_message(user, rules)
                 else:
                     try:
-                        msg = "*Extrait du règlement :*\n```css\n" + rulesLines[line] + "\n```"
+                        base = "*Extrait du règlement :*"
+                        if i >= 6:
+                            base += "\nCe qui est interdit :"
+                        msg = base + "\n```css\n" + rulesLines[line] + "\n```"
                     except IndexError as e:
                         raise IndexError("Cette règle n'existe pas")
                     await self.bot.send_message(user, msg)
