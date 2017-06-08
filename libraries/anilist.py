@@ -29,7 +29,12 @@ def getAnimeInfo(anime, token):
 	anime = str(anime)
 	q = requests.get('https://anilist.co/api/anime/search/{0}'.format(anime), params={'access_token':token})
 	data = q.json()
-	data = filter(lambda x: x.get("title_english") == anime, data)
+
+	if " " in anime:
+		anime = anime.split(" ")
+		anime = anime[0]
+
+	data = filter(lambda x: anime in x.get("title_english"), data)
 	data = list(data)
 	data = data[0]
 
@@ -53,6 +58,9 @@ def getAnimeGenres(data):
 def formatAnimeDescription(data):
 	desc = data['description']
 	desc = desc.replace("<br>", "")
+	if len(desc) > 800:
+		desc = desc[:800]
+		desc += "..."
 	return desc
 
 #####################################################################################################################################################

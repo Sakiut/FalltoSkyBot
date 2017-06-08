@@ -362,6 +362,7 @@ class LeagueOfLegends:
 
     @commands.command(pass_context=True, no_pm=False)
     async def freechamps(self, ctx):
+        """Retourne la liste des champions gratuits"""
 
         try:
             await self.bot.delete_message(ctx.message)
@@ -1595,6 +1596,7 @@ class RSS:
     @commands.command(pass_context=True, no_pm=True)    
     async def forceupdate(self, ctx):
         """[ADMIN] Teste le système d'update de flux RSS"""
+        await self.bot.delete_message(ctx.message)
         if ctx.message.author.server_permissions.administrator == True:
             update = youtube.update(self.feed)
             if update != "304":
@@ -1616,6 +1618,7 @@ class RSS:
     @commands.command(pass_context=True, no_pm=True)
     async def updatelastentry(self, ctx):
         """[ADMIN] Force la dernière entrée RSS"""
+        await self.bot.delete_message(ctx.message)
         if ctx.message.author.server_permissions.administrator == True:
             entry = youtube.getLastEntry()
             YTEmbed = discord.Embed()
@@ -1637,6 +1640,7 @@ bot.add_cog(Vote(bot))
 bot.add_cog(Jeux(bot))
 bot.add_cog(LeagueOfLegends(bot))
 bot.add_cog(Anime(bot))
+bot.add_cog(RSS(bot))
 
 #YT RSS
 async def my_background_task():
