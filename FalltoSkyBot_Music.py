@@ -722,7 +722,7 @@ class Vote:
                     else:
                         non = self.VoteMess['non']
                         non = int(non) + 1
-                        self.VoteMess['non'] = Non
+                        self.VoteMess['non'] = non
                         
                         filler = {ctx.message.author.name:"Non"}
                         self.Voters.update(filler)
@@ -1121,7 +1121,7 @@ class Admin:
                 if line == "all":
                     pass
                 else:
-                    raise ValueError(e)
+                    raise ValueError("Seuls soit un entier soit la mention all (insensible à la casse) est attendue.")
 
             if user == None:
                 user = ctx.message.channel
