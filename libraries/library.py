@@ -278,6 +278,19 @@ def getVoiceChannels(server):
 
 #####################################################################################################################################################
 
+def getServerMembers(server):
+	"""Retourne la liste des noms des membres du serveur"""
+
+	Members = server.members
+	End = []
+
+	for member in Members:
+		End.append(member.name)
+
+	return End
+
+#####################################################################################################################################################
+
 def dateConverter(date:str):
 	"""Convertit le format de lecture d'une date"""
 	date = str(date)

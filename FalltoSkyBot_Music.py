@@ -805,7 +805,7 @@ class Vote:
         member = ctx.message.author
         await self.bot.delete_message(ctx.message)
         
-        fmt = "```\n+--------------------+----------+" + "\n|{0:20}|{1:10}|".format("Voter", "Vote") + "\n+--------------------+----------+"
+        fmt = "```\n+--------------------+----------+" + "\n|{0:25}|{1:10}|".format("Voter", "Vote") + "\n+--------------------+----------+"
         
         if self.Voters != None:
             if member.server_permissions.administrator == True:
@@ -1183,6 +1183,25 @@ class Admin:
         await self.bot.edit_message(tmp, "```Test terminé```")
         await asyncio.sleep(5)
         await self.bot.delete_message(tmp)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def randomplayer(self, ctx):
+        """Retourne un membre du serveur au hasard"""
+        await self.bot.delete_message(ctx.message)
+        server = ctx.message.server
+        members = getServerMembers(server)
+
+        length = len(members) - 1
+        rand = random.randint(0, length)
+
+        member = members[rand]
+
+        MbrEmbed = discord.Embed()
+        MbrEmbed.colour = 0x3498db
+        MbrEmbed.title = "Random Player :"
+        MbrEmbed.description = member
+        MbrEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
+        await self.bot.say(embed=MbrEmbed)
 
 class Messages:
     """Commandes Textuelles"""
