@@ -8,6 +8,7 @@ from libraries.library import *
 from libraries import anilist
 from libraries import lol
 from libraries import youtube
+from libraries import moderation
 from libraries.lol import msToHourConverter
 
 from riotwatcher import RiotWatcher
@@ -18,6 +19,7 @@ import random
 import os
 import math
 import traceback
+import pickle
 
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -1074,7 +1076,8 @@ class Admin:
                 ConvocEmbed.title = "Convocation"
                 ConvocEmbed.colour = 0x3498db
                 ConvocEmbed.set_thumbnail(url=member.avatar_url)
-                ConvocEmbed.description = "Vous avez été convoqué par l'administration du serveur **{0}** pour la raison qui suit. Vous êtes prié de vous rendre sur le serveur dans les plus brefs délais et de vous mettre en contact avec un des administrateurs ou des modérateurs".format(ctx.message.server.name)
+                ConvocEmbed.description = "Vous avez été convoqué par l'administration du serveur **{0}** pour la raison qui suit.\n\
+Vous êtes prié de vous rendre sur le serveur dans les plus brefs délais et de vous mettre en contact avec un des administrateurs ou des modérateurs".format(ctx.message.server.name)
                 ConvocEmbed.add_field(name = 'Raison', value = reason)
                 ConvocEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
 
@@ -1218,8 +1221,8 @@ class Messages:
 
     @commands.command(pass_context=True, no_pm=False)
     async def ip(self, ctx):
-        """Envoie l'IP du serveur HolyFTS"""
-        await self.bot.say("{0.message.author.mention} IP du serveur HolyFTS : {1}".format(ctx, getServerIP()))
+        """Envoie l'IP du serveur Minecraft"""
+        await self.bot.say("{0.message.author.mention} IP du serveur Minecraft : {1}".format(ctx, getServerIP()))
         print('[FTS] IP sent')
 
     @commands.command(pass_context=True, no_pm=False)
@@ -1323,7 +1326,7 @@ class Messages:
             await self.bot.say("Vous n'avez pas l'autorisation de gérer les messages")
             print('[FTS] Purge : Command aborted : User do not have manage_messages permission')
 
-    @commands.command(pass_context=True, no_pm=True) #FIXME : Non fonctionnel - bug ?
+    @commands.command(pass_context=True, no_pm=True)
     async def purgeuser(self, ctx, limit=10, *, user:discord.Member):
         """Supprime le nombre de messages spécifié du membre choisi
 
@@ -1618,6 +1621,115 @@ class Music:
             await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
             print('[FTS] Now playing {} [skips: {}/3]'.format(state.current, skip_count))
 
+class Moderation:
+    """Moderation related commands"""
+
+    def __init__(self, bot):
+        self.bot = bot
+        self.data = moderation.start()
+
+    def getModChan(self, server):
+        Channels = server.channels
+        End = []
+        Return = False
+        for chan in list(Channels):
+            Name = str(chan.name)
+            Type = str(chan.type)
+            if "moderation" in str(chan.name):
+                if Type is "text":
+                    ModChan = chan
+                    Return = True
+        if Return is not True:
+            ModChan = self.bot.create_channel(server, 'moderation', type=discord.ChannelType.text)
+        return ModChan
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def warn(self, ctx, user:discord.Member):
+        """Avertit un utilisateur
+        Utilisable uniquement par la modération (permissions de ban et au-dessus)"""
+        await self.bot.delete_message(ctx.message)
+        if ctx.message.author.server_permissions.ban_members == True:
+            server = ctx.message.server
+            ModChan = self.getModChan(server)
+            self.data = moderation.warn(server, user, self.data)
+            try:
+                level = self.data[server.name][user.name]
+            except KeyError:
+                level = 1
+            if level < 3:
+                fmt = discord.Embed()
+                fmt.title = ("ATTENTION")
+                fmt.colour = 0x3498db
+                fmt.set_thumbnail(url=server.icon_url)
+                fmt.description = "Vous avez été averti-e par un-e modérateur-trice du serveur **{0}** en raison de votre comportement.\n\
+Vous avez actuellement {1} avertissement(s) à votre actif. Au bout de trois, une motion de convocation disciplinaire sera lancée et vous serez lourdement sanctionné-e par l'administration de notre serveur.\n\
+Merci de prendre garde à votre comportement à l'avenir.".format(server.name, str(level))
+                await self.bot.send_message(user, embed=fmt)
+                msg = "@here {0.name} a atteint {1} avertissement(s).".format(user, str(level))
+                await self.bot.send_message(ModChan, msg)
+            elif level == 3:
+                fmt = discord.Embed()
+                fmt.title = ("ATTENTION")
+                fmt.colour = 0x3498db
+                fmt.set_thumbnail(url=server.icon_url)
+                fmt.description = "Vous avez été averti-e par un-e modérateur-trice du serveur **{0}** en raison de votre comportement.\n\
+Vous avez actuellement {1} avertissement(s) à votre actif. Au bout de trois, une motion de convocation disciplinaire sera lancée et vous serez lourdement sanctionné-e par l'administration de notre serveur.\n\
+Merci de prendre garde à votre comportement à l'avenir.".format(server.name, str(level))
+                await self.bot.send_message(user, embed=fmt)
+                msg = "@here {0.name} a atteint 3 avertissements. Merci de prendre les mesures nécessaires.".format(user)
+                await self.bot.send_message(ModChan, msg)
+            else:
+                msg = "@here {0.name} a atteint {1} avertissements. Il ou elle a dépassé la limite. Merci de prendre les mesures nécessaires.".format(user, str(level))
+                await self.bot.send_message(ModChan, msg)
+        else:
+            await self.bot.say("```\nVous n'avez pas la permission d'avertir un utilisateur\n```")
+
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def pardon(self, ctx, user:discord.Member):
+        """Pardonne un utilisateur (lui retire un avertissement)
+        Utilisable uniquement par la modération (permissions de ban et au-dessus)"""
+        await self.bot.delete_message(ctx.message)
+        if ctx.message.author.server_permissions.ban_members == True:
+            server = ctx.message.server
+            ModChan = self.getModChan(server)
+            if server.name in self.data.keys():
+                if user.name in self.data[server.name].keys():
+                    level = self.data[server.name][user.name]
+                    if level <= 1:
+                        del self.data[server.name][user.name]
+                        msg = "Un-e modérateur-trice a retiré votre seul avertissement. Vous n'avez plus aucun antécédent."
+                        fmt = "@here {0.mention} a pardonné à {1.mention}. Il n'a plus aucun antécédent.".format(ctx.message.author, user)
+                    else:
+                        self.data[server.name][user.name] -= 1
+                        level = self.data[server.name][user.name]
+                        msg = "Un-e modérateur-trice vous a retiré un avertissement. Il vous reste {0} avertissement(s).".format(str(level))
+                        fmt = "@here {0.mention} a pardonné à {1.mention}. Il n'a plus que {2} avertissements.".format(ctx.message.author, user, str(level))
+                    await self.bot.send_message(user, msg)
+                    await self.bot.send_message(ModChan, fmt)
+                    f = open(fileName, "wb")
+                    p = pickle.Pickler(f)
+                    p.dump(self.data)
+                    f.close()
+                else:
+                    await self.bot.say("```\nL'utilisateur n'a aucun antécédent\n```")
+            else:
+                await self.bot.say("```\nL'utilisateur n'a aucun antécédent\n```")
+        else:
+            await self.bot.say("```\nVous n'avez pas la permission de pardonner un utilisateur\n```")
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def checkwarn(self, ctx, user:discord.Member):
+        """Montre le nombre d'avertissements d'un utilisateur"""
+        await self.bot.delete_message(ctx.message)
+        server = ctx.message.server
+        level = moderation.getWarns(server, user, self.data)
+        fmt = discord.Embed()
+        fmt.colour = 0x3498db
+        fmt.set_author(name = user.name, icon_url=user.avatar_url)
+        fmt.description = "{0} avertissements".format(str(level))
+        await self.bot.say(embed=fmt)
+
 class RSS:
 
     def __init__(self, bot):
@@ -1673,6 +1785,7 @@ bot.add_cog(Jeux(bot))
 bot.add_cog(LeagueOfLegends(bot))
 bot.add_cog(Anime(bot))
 bot.add_cog(RSS(bot))
+bot.add_cog(Moderation(bot))
 
 #YT RSS
 async def my_background_task():
