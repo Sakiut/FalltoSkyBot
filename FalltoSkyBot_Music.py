@@ -214,73 +214,73 @@ class LeagueOfLegends:
     @commands.command(pass_context=True, no_pm=False)
     async def summoner(self, ctx, *, user:str):
         """Récupère les informations d'un invocateur"""
+
+        await self.bot.delete_message(ctx.message)
+        tmp = await self.bot.say("Processing request...")
+
         try:
-            tmp = await self.bot.say("Processing request...")
-            await self.bot.delete_message(ctx.message)
             user = user.replace(" ", "")
 
-            try:
-                summoner = lol.getSummonerInfo(user)
-                SummonerWins = lol.getUnrankedWins(summoner['id'])
-                SummonerRank = lol.getRank(summoner['id'])
+            data = lol.getSummonerStats(user)
 
-                SummonerEmbed = discord.Embed()
-                SummonerEmbed.colour = 0x3498db
-                SummonerEmbed.title = 'League of Legends Basic stats for ' + summoner['name'] + ' (' + str(summoner['id']) + ')'
-                SummonerEmbed.set_thumbnail(url=lol.getSummonerIconUrl(summoner['name']))
-                SummonerEmbed.add_field(name = 'ID Icône', value = str(summoner['profileIconId']))
-                SummonerEmbed.add_field(name = 'Niveau', value = str(summoner['summonerLevel']))
-                SummonerEmbed.add_field(name = 'Wins', value = str(SummonerWins))
-                SummonerEmbed.add_field(name = 'Rank', value = str(SummonerRank))
-                SummonerEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
-                await self.bot.delete_message(tmp)
-                await self.bot.say(embed=SummonerEmbed)
+            name = str(data["name"])
+            sum_id = str(data['id'])
+            level = str(data['level'])
+            icon = str(data['icon'])
 
-            except KeyError:
-                await self.bot.say("```py\nSummoner not found\n```")
-                await self.bot.delete_message(tmp)
+            tier5c5 = str(data['tier5c5'])
+            rank5c5 = str(data['rank5c5'])
+            winr5c5 = str(data['winr5c5'])
+            tierflex = str(data['tierflex'])
+            rankflex = str(data['rankflex'])
+            winrflex = str(data['winrflex'])
+            tier33 = str(data['tier33'])
+            rank33 = str(data['rank33'])
+            winr33 = str(data['winr33'])
+
+            best_champ = str(data['best_champ'])
+            best_level = str(data['best_level'])
+            best_point = str(data['best_point'])
+            sec_champ = str(data['sec_champ'])
+            sec_level = str(data['sec_level'])
+            sec_point = str(data['sec_point'])
+            tri_champ = str(data['tri_champ'])
+            tri_level = str(data['tri_level'])
+            tri_point = str(data['tri_point'])
+
+            SummonerEmbed = discord.Embed()
+            SummonerEmbed.colour = 0x3498db
+            SummonerEmbed.title = "Summoner Information for {0} ({1})".format(name, sum_id)
+            SummonerEmbed.set_thumbnail(url=icon)
+            SummonerEmbed.add_field(name = "_ _", value = "_ _", inline = False)
+            SummonerEmbed.add_field(name = "Nom", value = name)
+            SummonerEmbed.add_field(name = "Niveau", value = level)
+            SummonerEmbed.add_field(name = "_ _", value = "_ _", inline = False)
+            SummonerEmbed.add_field(name = "Ranked Solo Duo", value = tier5c5 + " " + rank5c5)
+            SummonerEmbed.add_field(name = "Winrate", value = winr5c5)
+            SummonerEmbed.add_field(name = "Ranked Flex 5c5", value = tierflex + " " + rankflex)
+            SummonerEmbed.add_field(name = "Winrate", value = winrflex)
+            SummonerEmbed.add_field(name = "Ranked Flex 3c3", value = tier33 + " " + rank33)
+            SummonerEmbed.add_field(name = "Winrate", value = winr33)
+            SummonerEmbed.add_field(name = "_ _", value = "_ _", inline = False)
+            SummonerEmbed.add_field(name = "Meilleur Champion", value = best_champ)
+            SummonerEmbed.add_field(name = "XP", value = "**Maîtrise** : {0}, **Points** : {1}k".format(best_level, best_point))
+            SummonerEmbed.add_field(name = "Meilleur Champion", value = sec_champ)
+            SummonerEmbed.add_field(name = "XP", value = "**Maîtrise** : {0}, **Points** : {1}k".format(sec_level, sec_point))
+            SummonerEmbed.add_field(name = "Meilleur Champion", value = tri_champ)
+            SummonerEmbed.add_field(name = "XP", value = "**Maîtrise** : {0}, **Points** : {1}k".format(tri_level, tri_point))
+            SummonerEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
+
+            await self.bot.delete_message(tmp)
+            await self.bot.say(embed = SummonerEmbed)
 
         except Exception as e:
-            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.delete_message(tmp)
+            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 
     @commands.command(pass_context=True, no_pm=False)
-    async def rankedfullinfo(self, ctx, *, user:str):
-        """Récupère les informations concernant les rankeds d'un invocateur"""
-        try:
-            tmp = await self.bot.say("Processing request...")
-            await self.bot.delete_message(ctx.message)
-
-            try:
-                summoner = lol.getSummonerInfo(user)
-                SummonerStats = lol.getRankedStats(summoner['id'])
-                SummonerRank = lol.getRank(summoner['id'])
-
-                SummonerEmbed = discord.Embed()
-                SummonerEmbed.colour = 0x3498db
-                SummonerEmbed.title = 'Ranked League of Legends stats for ' + summoner['name'] + ' (' + str(summoner['id']) + ')'
-                SummonerEmbed.set_thumbnail(url=lol.getSummonerIconUrl(summoner['name']))
-                SummonerEmbed.add_field(name = 'ID Icône', value = str(summoner['profileIconId']))
-                SummonerEmbed.add_field(name = 'Niveau', value = str(summoner['summonerLevel']))
-                SummonerEmbed.add_field(name = 'Wins', value = str(SummonerStats['wins']))
-                SummonerEmbed.add_field(name = 'Losses', value = str(SummonerStats['losses']))
-                SummonerEmbed.add_field(name = 'Rank', value = str(SummonerRank))
-                SummonerEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
-                await self.bot.delete_message(tmp)
-                await self.bot.say(embed=SummonerEmbed)
-
-            except KeyError:
-                await self.bot.say("```py\nSummoner not found\n```")
-                await self.bot.delete_message(tmp)
-
-        except Exception as e:
-            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
-            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
-            await self.bot.delete_message(tmp)
-
-    @commands.command(pass_context=True, no_pm=False)
-    async def unrankedfullinfo(self, ctx, *, user:str):
+    async def unranked(self, ctx, *, user:str):
         """Récupère les informations complètes des normal games d'un invocateur"""
         try:
             tmp = await self.bot.say("Processing request...")
@@ -315,6 +315,7 @@ class LeagueOfLegends:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
             await self.bot.delete_message(tmp)
+            
     @commands.command(pass_context=True, no_pm=False)
     async def champion(self, ctx, *, champion:str):
         """Récupère les informations d'un champion

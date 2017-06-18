@@ -258,3 +258,153 @@ def getFreeChamps():
 	return freeChamps
 
 #####################################################################################################################################################
+
+def getSummonerStats(summoner:str):
+
+    q = requests.get("https://euw1.api.riotgames.com/lol/summoner/v3/summoners/by-name/"+summoner+"?api_key="+ApiKey)
+
+    if q.status_code == 200:
+        q = q.json()
+    elif q.status_code == 404:
+        raise NameError("Summoner not found")
+    elif q.status_code == 401:
+        raise ImportError("Access denied")
+    elif q.status_code == 503:
+        raise ImportError("Service down. Please try again later.")
+    else:
+        raise Exception("An error occured processing this request. Code: {0}".format(str(q.status_code)))
+
+    level = q['summonerLevel']
+    name = q['name']
+    sum_id = str(q['id'])
+    icon = 'https://avatar.leagueoflegends.com/EUW1/' + summoner + '.png'
+
+    #League
+
+    r = requests.get("https://euw1.api.riotgames.com/lol/league/v3/positions/by-summoner/"+sum_id+"?api_key="+ApiKey)
+
+    if r.status_code == 200:
+        r = r.json()
+    elif r.status_code == 404:
+        raise NameError("Summoner not found")
+    elif r.status_code == 401:
+        raise ImportError("Access denied")
+    elif r.status_code == 503:
+        raise ImportError("Service down. Please try again later.")
+    else:
+        raise Exception("An error occured processing this request. Code: {0}".format(str(r.status_code)))
+
+    tier5c5 = "Unranked"
+    rank5c5 = "_ _"
+    winr5c5 = 'N/A'
+
+    tierflex = "Unranked"
+    rankflex = "_ _"
+    winrflex = "N/A"
+
+    tier33 = "Unranked"
+    rank33 = '_ _'
+    winr33 = 'N/A'
+
+    if not r:
+        pass
+    else:
+        for x in r:
+            if x['queueType'] == "RANKED_SOLO_5x5":
+                tier5c5 = x['tier']
+                rank5c5 = x['rank']
+                winr5c5 = str("{0:3.2f}".format((x['wins'] / (x['wins'] + x['losses'])) * 100)) + " %"
+            elif x['queueType'] == "RANKED_FLEX_SR":
+                tierflex = x['tier']
+                rankflex = x['rank']
+                winrflex = str("{0:3.2f}".format((x['wins'] / (x['wins'] + x['losses'])) * 100)) + " %"
+            elif x['queueType'] == "RANKED_FLEX_TT":
+                tier33 = x['tier']
+                rank33 = x['rank']
+                winr33 = str("{0:3.2f}".format((x['wins'] / (x['wins'] + x['losses'])) * 100)) + " %"
+
+    #Champ
+
+    r = requests.get("https://euw1.api.riotgames.com/lol/champion-mastery/v3/champion-masteries/by-summoner/"+sum_id+"?api_key="+ApiKey)
+
+    if r.status_code == 200:
+        r = r.json()
+    elif r.status_code == 404:
+        raise NameError("Summoner not found")
+    elif r.status_code == 401:
+        raise ImportError("Access denied")
+    elif r.status_code == 503:
+        raise ImportError("Service down. Please try again later.")
+    else:
+        raise Exception("An error occured processing this request. Code: {0}".format(str(r.status_code)))
+
+    r = r[:3]
+
+    champ_names = [
+        "N/A",
+        "N/A",
+        "N/A"
+    ]
+
+    champ_levels = [
+        "N/A",
+        "N/A",
+        "N/A"
+    ]
+
+    champ_points = [
+        "N/A",
+        "N/A",
+        "N/A"
+    ]
+
+    if not r:
+        pass
+    else:
+        i = 0
+        for x in r:
+            champ_names[i] = getChampionName(x['championId'])
+            champ_levels[i] = x['championLevel']
+            champ_points[i] = x['championPoints']
+            i += 1
+
+    best_champ = champ_names[0]
+    best_level = champ_levels[0]
+    best_point = champ_points[0] / 1000
+
+    sec_champ = champ_names[1]
+    sec_level = champ_levels[1]
+    sec_point = champ_points[1] / 1000
+
+    tri_champ = champ_names[2]
+    tri_level = champ_levels[2]
+    tri_point = champ_points[2] / 1000
+
+    data = {
+        "name": name,
+        "id": sum_id,
+        "level": level,
+        "icon": icon,
+        "tier5c5": tier5c5,
+        "rank5c5": rank5c5,
+        "winr5c5": winr5c5,
+        "tierflex": tierflex,
+        "rankflex": rankflex,
+        "winrflex": winrflex,
+        "tier33": tier33,
+        "rank33": rank33,
+        "winr33": winr33,
+        "best_champ": best_champ,
+        "best_level": best_level,
+        "best_point": best_point,
+        "sec_champ": sec_champ,
+        "sec_level": sec_level,
+        "sec_point": sec_point,
+        "tri_champ": tri_champ,
+        "tri_level": tri_level,
+        "tri_point": tri_point
+    }
+
+    return data
+
+#####################################################################################################################################################
