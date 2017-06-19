@@ -6,7 +6,7 @@
 Le Fall to Sky Bot est un bot fonctionnant sous python 3.5 conçu pour administrer le serveur du même nom. Il a de multiples fonctionnalités
 et est toujours en cours de développement. Il vient de se placer sous le sigle du Open-Source et sa publication est entamée.
 
-L'application est soumise à la license AGNUv.3.0
+L'application est soumise à la license `AGPL v3.0`.
 
 ## Fonctionnalités
 
