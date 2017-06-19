@@ -33,10 +33,12 @@ python -m pip install -U discord.py
 
 **Pour les fonctionnalités associées aux Animes / Mangas, vous devrez vous munir d'un compte et d'une application AniList et des deux clés d'API qui y sont associées, que vous placerez dans le fichier `config.txt`.**
 
+**Pour la fonctionnalité de lecture de flux RSS YouTube, merci de renseigner l'ID de votre chaîne YouTube dans le fichier `config.txt`.**
+
 ### Contact
 
 Pour tout souci lié au bot, vous pouvez me contacter à
-a.sk.dmin@gmail.com
+`contact@sakiut.fr`
 
 Ou sur le serveur Discord de la Fall to Sky, ici :
 http://sakiut.fr/discord, Invitation n° wS4k8r9
