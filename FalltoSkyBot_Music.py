@@ -9,7 +9,6 @@ from libraries import anilist
 from libraries import lol
 from libraries import youtube
 from libraries import moderation
-from libraries.lol import msToHourConverter
 
 from riotwatcher import RiotWatcher
 from riotwatcher import EUROPE_WEST
@@ -20,6 +19,7 @@ import os
 import math
 import traceback
 import pickle
+import urllib
 
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -265,9 +265,9 @@ class LeagueOfLegends:
             SummonerEmbed.add_field(name = "_ _", value = "_ _", inline = False)
             SummonerEmbed.add_field(name = "Meilleur Champion", value = best_champ)
             SummonerEmbed.add_field(name = "XP", value = "**Maîtrise** : {0}, **Points** : {1}k".format(best_level, best_point))
-            SummonerEmbed.add_field(name = "Meilleur Champion", value = sec_champ)
+            SummonerEmbed.add_field(name = "Deuxième Champion", value = sec_champ)
             SummonerEmbed.add_field(name = "XP", value = "**Maîtrise** : {0}, **Points** : {1}k".format(sec_level, sec_point))
-            SummonerEmbed.add_field(name = "Meilleur Champion", value = tri_champ)
+            SummonerEmbed.add_field(name = "Troisième Champion", value = tri_champ)
             SummonerEmbed.add_field(name = "XP", value = "**Maîtrise** : {0}, **Points** : {1}k".format(tri_level, tri_point))
             SummonerEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
 
@@ -315,51 +315,56 @@ class LeagueOfLegends:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
             await self.bot.delete_message(tmp)
-            
+
     @commands.command(pass_context=True, no_pm=False)
     async def champion(self, ctx, *, champion:str):
         """Récupère les informations d'un champion
 
-        Source : http://champion.gg/
+        Source : https://champion.gg/
         """
         try:
-            tmp = await self.bot.say("Processing request...")
             await self.bot.delete_message(ctx.message)
+            tmp = await self.bot.say("Processing request...")
+            champion = champion.lower()
+            name = champion.capitalize()
 
-            try:
-                champstat = lol.getChampionStats(champion)
-                champinfo = lol.getChampionInfo(champstat['id'])
-                champgg = lol.getChampionGG(champion)
-                champ3430 = champgg['3430']
-                champ3432 = champgg['3432']
-                champ3432Stats = champ3432['stats']
-                WinRate = champ3432Stats['winRate'] * 100
-                PlayRate = champ3432Stats['playRate'] * 100
-                BanRate = champ3432Stats['banRate'] * 100
+            if "'" in champion:
+                champion = champion.replace("'", "")
 
-                WinRateMess = "{0:3.4f} %".format(WinRate)
-                PlayRateMess = "{0:3.4f} %".format(PlayRate)
-                BanRateMess = "{0:3.4f} %".format(BanRate)
+            if " " in champion:
+                champ = champion.split(" ")
+                champion = "{}{}".format(champ[0].capitalize(), champ[1].capitalize())
+                stats = lol.getChampion(champion)
+                icon = lol.getChampionIconUrl(champion)
+            else:
+                stats = lol.getChampion(champion)
+                icon = lol.getChampionIconUrl(champion)
 
-                ChampionEmbed = discord.Embed()
-                ChampionEmbed.colour = 0x3498db
-                ChampionEmbed.title = 'Stats for ' + champstat['name'] + ' (' + str(champstat['id']) + ')'
-                ChampionEmbed.set_thumbnail(url=lol.getChampionIconUrl(champstat['name']))
-                ChampionEmbed.add_field(name = 'Title', value = champstat['title'])
-                ChampionEmbed.add_field(name = 'Free', value = champinfo['freeToPlay'])
-                ChampionEmbed.add_field(name = 'Role', value = champ3430['role'])
-                ChampionEmbed.add_field(name = 'Win Rate', value = WinRateMess)
-                ChampionEmbed.add_field(name = 'Play Rate', value = PlayRateMess)
-                ChampionEmbed.add_field(name = 'Ban Rate', value = BanRateMess)
-                ChampionEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
-                await self.bot.delete_message(tmp)
-                await self.bot.say(embed=ChampionEmbed)
+            id = stats[0]
+            del stats[0]
 
-            except KeyError:
-                await self.bot.say("```py\nChampion not found\n```")
-                await self.bot.delete_message(tmp)
+            ChampionEmbed = discord.Embed()
+            ChampionEmbed.title = "Stats for {0} ({1})".format(name, str(id))
+            ChampionEmbed.colour = 0x3498db
+            ChampionEmbed.set_thumbnail(url=icon)
+            ChampionEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
+
+            for stat in stats:
+                for key, value in stat.items():
+                    value["winRate"] *= 100
+                    value["playRate"] *= 100
+                    value["banRate"] *= 100
+                    ChampionEmbed.add_field(name = "_ _", value = "`{}`".format(key.upper()), inline = False)
+                    ChampionEmbed.add_field(name = "Winrate", value = "{0:3.4f} %".format(value["winRate"]))
+                    ChampionEmbed.add_field(name = "Playrate", value = "{0:3.4f} %".format(value["playRate"]))
+                    ChampionEmbed.add_field(name = "Banrate", value = "{0:3.4f} %".format(value["banRate"]))
+                    ChampionEmbed.add_field(name = "Average Ratio", value = "{0:2.1f}/{1:2.1f}/{2:2.1f}".format(value["kills"], value["deaths"], value["assists"]))
+
+            await self.bot.delete_message(tmp)
+            await self.bot.say(embed=ChampionEmbed)
 
         except Exception as e:
+            await self.bot.delete_message(tmp)
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 
@@ -808,13 +813,13 @@ class Vote:
         member = ctx.message.author
         await self.bot.delete_message(ctx.message)
         
-        fmt = "```\n+--------------------+----------+" + "\n|{0:25}|{1:10}|".format("Voter", "Vote") + "\n+--------------------+----------+"
+        fmt = "```\n+-------------------------+----------+" + "\n|{0:25}|{1:10}|".format("Voter", "Vote") + "\n+-------------------------+----------+"
         
         if self.Voters != None:
             if member.server_permissions.administrator == True:
                 for voter, vote in self.Voters.items():
-                    fmt += "\n|{0:20}|{1:10}|".format(voter, vote)
-                fmt += "\n+--------------------+----------+\n```"
+                    fmt += "\n|{0:25}|{1:10}|".format(voter, vote)
+                fmt += "\n+-------------------------+----------+\n```"
                 await self.bot.say(fmt)
             else:
                 await self.bot.say("```\nVous n'êtes pas administrateur-e\n```")
