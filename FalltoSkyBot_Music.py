@@ -335,7 +335,7 @@ class LeagueOfLegends:
                 champ = champion.split(" ")
                 champion = "{}{}".format(champ[0].capitalize(), champ[1].capitalize())
                 stats = lol.getChampion(champion)
-                icon = lol.getChampionIconUrl(champion)
+                icon = lol.getChampionIconUrl(champion) #FIXME : Les noms composés n'ont pas d'icône.
             else:
                 stats = lol.getChampion(champion)
                 icon = lol.getChampionIconUrl(champion)
@@ -1166,9 +1166,9 @@ Vous êtes prié de vous rendre sur le serveur dans les plus brefs délais et de
         if requester.id == '187565415512276993':
             await self.bot.send_message(bot.get_channel('283397577552953344'), "```Déconnection du bot```")
             print('[FTS] Déconnexion...')
-            bot.logout()
+            self.bot.logout()
             print('[FTS] Logged out')
-            bot.close()
+            self.bot.close()
             print('[FTS] Connexions closed')
             os.system('pause')
             exit()
@@ -1427,6 +1427,7 @@ class Messages:
             await self.bot.say("```css\nServer temporairement indisponible, l'opération ne peut être achevée\n```")
 
         except Exception as e:
+            await self.bot.delete_message(tmp)
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
 
@@ -1735,6 +1736,46 @@ Merci de prendre garde à votre comportement à l'avenir.".format(server.name, s
         fmt.set_author(name = user.name, icon_url=user.avatar_url)
         fmt.description = "{0} avertissements".format(str(level))
         await self.bot.say(embed=fmt)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def mute(self, ctx, *, user:discord.Member):
+        """Mute un utilisateur
+        Requiert la permission de kick"""
+
+        await self.bot.delete_message(ctx.message)
+
+        if ctx.message.author.server_permissions.kick_members == True:
+
+            overwrite = ctx.message.channel.overwrites_for(user) or discord.PermissionOverwrite()
+            overwrite.send_messages = False
+            await self.bot.edit_channel_permissions(ctx.message.channel, user, overwrite)
+            tmp = await self.bot.send_message(ctx.message.channel, "{} is now muted here !".format(user.mention))
+            await asyncio.sleep(5)
+            await self.bot.delete_message(tmp)
+
+        else:
+            tmp = await self.bot.say("```\nVous n'avez pas la permission d'utiliser cette commande\n```")
+            await asyncio.sleep(5)
+            await self.bot.delete_message(tmp)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def unmute(self, ctx, *, user:discord.Member):
+
+        await self.bot.delete_message(ctx.message)
+
+        if ctx.message.author.server_permissions.kick_members == True:
+
+            overwrite = ctx.message.channel.overwrites_for(user) or discord.PermissionOverwrite()
+            overwrite.send_messages = True
+            await self.bot.edit_channel_permissions(ctx.message.channel, user, overwrite)
+            tmp = await self.bot.send_message(ctx.message.channel, "{} is no longer muted here! He/she can speak now!".format(user.mention))
+            await asyncio.sleep(5)
+            await self.bot.delete_message(tmp)
+
+        else:
+            tmp = await self.bot.say("```\nVous n'avez pas la permission d'utiliser cette commande\n```")
+            await asyncio.sleep(5)
+            await self.bot.delete_message(tmp)
 
 class RSS:
 
