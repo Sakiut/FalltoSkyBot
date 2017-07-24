@@ -686,15 +686,16 @@ class Vote:
             self.VoteEmbed = discord.Embed()
             self.VoteEmbed.title = "Vote : " + self.subject
             self.VoteEmbed.colour = 0x3498db
+            self.VoteEmbed.description = "_ _"
             self.VoteEmbed.set_footer(text = "Requested by {0}".format(self.Requester.name), icon_url = self.Requester.avatar_url)
-            self.VoteEmbed.add_field(name = "✔", value = self.oui)
-            self.VoteEmbed.add_field(name = "✖", value = self.non)
+            self.VoteEmbed.add_field(name = "✅", value = self.oui)
+            self.VoteEmbed.add_field(name = "❎", value = self.non)
 
             mess = await self.bot.say(embed=self.VoteEmbed)
             self.Mess = mess
 
-            await self.bot.add_reaction(mess, "✔")
-            await self.bot.add_reaction(mess, "✖")
+            await self.bot.add_reaction(mess, "✅")
+            await self.bot.add_reaction(mess, "❎")
         else:
             tmp = await self.bot.say('Vote déjà en cours')
             await asyncio.sleep(5)
@@ -710,6 +711,7 @@ class Vote:
             self.VoteEmbed.title = "Vote : " + self.subject + " [TERMINÉ]"
             await self.bot.edit_message(self.Mess, embed=self.VoteEmbed)
             await self.bot.clear_reactions(self.Mess)
+            self.VoteState == None
         else:
             tmp = await self.bot.say('Aucun vote en cours')
             await asyncio.sleep(5)
@@ -721,19 +723,19 @@ class Vote:
             if user == bot.user:
                 return
             elif user not in self.Voters:
-                if reaction.emoji == "✔":
-                    await self.bot.remove_reaction(reaction.message, "✔", user)
+                if reaction.emoji == "✅":
+                    await self.bot.remove_reaction(reaction.message, "✅", user)
                     self.Voters.append(user)
                     self.oui += 1
-                    self.VoteEmbed.set_field_at(0, name = "✔", value = self.oui)
+                    self.VoteEmbed.set_field_at(0, name = "✅", value = self.oui)
 
                     await self.bot.edit_message(self.Mess, embed=self.VoteEmbed)
 
-                elif reaction.emoji == "✖":
-                    await self.bot.remove_reaction(reaction.message, "✖", user)
+                elif reaction.emoji == "❎":
+                    await self.bot.remove_reaction(reaction.message, "❎", user)
                     self.Voters.append(user)
                     self.non += 1
-                    self.VoteEmbed.set_field_at(1, name = "✖", value = self.non)
+                    self.VoteEmbed.set_field_at(1, name = "❎", value = self.non)
 
                     await self.bot.edit_message(self.Mess, embed=self.VoteEmbed)
                 else:
@@ -1683,6 +1685,8 @@ Merci de prendre garde à votre comportement à l'avenir.".format(server.name, s
 
     @commands.command(pass_context=True, no_pm=True)
     async def unmute(self, ctx, *, user:discord.Member):
+        """Unute un utilisateur
+        Requiert la permission de kick"""
 
         await self.bot.delete_message(ctx.message)
 
