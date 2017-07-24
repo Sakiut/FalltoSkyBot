@@ -54,6 +54,8 @@ freshestMemes = [
     "mem/meme15.jpeg"
 ]
 
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('.'), description="Commandes Bot Fall to Sky")
+
 class VoiceEntry:
     def __init__(self, message, player):
         self.requester = message.author
@@ -657,174 +659,90 @@ class LeagueOfLegends:
             traceback.print_tb(e.__traceback__)
 
 class Vote:
-    """Commandes de Vote"""
 
     def __init__(self,bot):
         self.bot = bot
-        self.voice_states = {}
-        self.VoteMess = None
+        self.VoteState = None
+        self.Mess = None
         self.Requester = None
-        self.VoteTitle = None
-        self.Voters = None
+        self.subject = None
+        self.Voters = []
+        self.oui = None
+        self.non = None
 
     @commands.command(pass_context=True, no_pm=True)
     async def votestart(self, ctx, *, subject : str):
         """Démarrer un vote"""
 
-        try:
-            await self.bot.delete_message(ctx.message)
+        await self.bot.delete_message(ctx.message)
+        if self.VoteState == None:
 
-            VoteEmbed = discord.Embed()
-            VoteEmbed.title = "Vote : " + subject
-            VoteEmbed.colour = 0x3498db
-            VoteEmbed.set_footer(text = "Requested by {0}".format(ctx.message.author.name), icon_url = ctx.message.author.avatar_url)
-
-            self.VoteTitle = subject
+            self.subject = subject
             self.Requester = ctx.message.author
-            self.VoteMess = {'oui': 0,'non': 0}
-            self.Voters = {}
+            self.VoteState = True
+            self.oui = 0
+            self.non = 0
 
-            await self.bot.say(embed=VoteEmbed)
+            self.VoteEmbed = discord.Embed()
+            self.VoteEmbed.title = "Vote : " + self.subject
+            self.VoteEmbed.colour = 0x3498db
+            self.VoteEmbed.set_footer(text = "Requested by {0}".format(self.Requester.name), icon_url = self.Requester.avatar_url)
+            self.VoteEmbed.add_field(name = "✔", value = self.oui)
+            self.VoteEmbed.add_field(name = "✖", value = self.non)
 
-        except Exception as e:
-            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
-            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
-            await self.bot.delete_message(ctx.message)
+            mess = await self.bot.say(embed=self.VoteEmbed)
+            self.Mess = mess
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def vote(self, ctx, *, answer:str='oui'):
-        """Répondre à un vote par oui ou non"""
-
-        answer = str(answer)
-        answer = answer.lower()
-
-        try:
-            if self.VoteMess != None:
-                if answer == 'oui':
-
-                    if ctx.message.author.name in self.Voters.keys():
-                        await self.bot.delete_message(ctx.message)
-                        tmp = await self.bot.say('```\nVous avez déjà voté\n```')
-                        await asyncio.sleep(5)
-                        await self.bot.delete_message(tmp)
-                    else:
-                        oui = self.VoteMess['oui']
-                        oui = int(oui) + 1
-                        self.VoteMess['oui'] = oui
-
-                        filler = {ctx.message.author.name:"Oui"}
-                        self.Voters.update(filler)
-
-                        await self.bot.delete_message(ctx.message)
-                        tmp = await self.bot.say("{0} Votre vote a bien été pris en compte".format(ctx.message.author.mention))
-                        await asyncio.sleep(5)
-                        await self.bot.delete_message(tmp)
-
-                elif answer == 'non':
-
-                    if ctx.message.author.name in self.Voters.keys():
-                        await self.bot.delete_message(ctx.message)
-                        tmp = await self.bot.say('```\nVous avez déjà voté\n```')
-                        await asyncio.sleep(5)
-                        await self.bot.delete_message(tmp)
-                    else:
-                        non = self.VoteMess['non']
-                        non = int(non) + 1
-                        self.VoteMess['non'] = non
-                        
-                        filler = {ctx.message.author.name:"Non"}
-                        self.Voters.update(filler)
-
-                        await self.bot.delete_message(ctx.message)
-                        tmp = await self.bot.say("{0} Votre vote a bien été pris en compte".format(ctx.message.author.mention))
-                        await asyncio.sleep(5)
-                        await self.bot.delete_message(tmp)
-
-                else:
-                    raise TypeError("Seulement oui ou non attendus")
-            else:
-                await self.bot.delete_message(ctx.message)
-                await self.bot.say("```\nAucun vote n'est en cours\n```")
-
-        except Exception as e:
-            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
-            await self.bot.delete_message(ctx.message)
-            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def votestatus(self, ctx):
-        """Donne le statut du vote en cours"""
-        try:
-            if self.VoteMess != None:
-                await self.bot.delete_message(ctx.message)
-                VoteEmbed = discord.Embed()
-                VoteEmbed.title = "Vote : " + self.VoteTitle
-                VoteEmbed.colour = 0x3498db
-                VoteEmbed.description = "{} personne(s) ont voté :".format(len(self.Voters))
-                VoteEmbed.add_field(name = 'Oui', value = str(self.VoteMess['oui']))
-                VoteEmbed.add_field(name = 'Non', value = str(self.VoteMess['non']))
-                VoteEmbed.set_footer(text = "Requested by {0}".format(self.Requester.name), icon_url = self.Requester.avatar_url)
-                await self.bot.say(embed=VoteEmbed)
-            else:
-                await self.bot.delete_message(ctx.message)
-                await self.bot.say("```\nAucun vote n'est en cours\n```")
-
-        except Exception as e:
-            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
-            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
-            await self.bot.delete_message(ctx.message)
+            await self.bot.add_reaction(mess, "✔")
+            await self.bot.add_reaction(mess, "✖")
+        else:
+            tmp = await self.bot.say('Vote déjà en cours')
+            await asyncio.sleep(5)
+            await self.bot.delete_message(tmp)
 
     @commands.command(pass_context=True, no_pm=True)
     async def votestop(self, ctx):
-        """Arrête le vote"""
-        try:
-            if self.VoteMess != None:
-                if ctx.message.author == self.Requester:
-                    await self.bot.delete_message(ctx.message)
-                    VoteEmbed = discord.Embed()
-                    VoteEmbed.title = "Résultats du Vote : " + self.VoteTitle
-                    VoteEmbed.colour = 0x3498db
-                    VoteEmbed.description = "{} personne(s) ont voté :".format(len(self.Voters))
-                    VoteEmbed.add_field(name = 'Oui', value = str(self.VoteMess['oui']))
-                    VoteEmbed.add_field(name = 'Non', value = str(self.VoteMess['non']))
-                    VoteEmbed.set_footer(text = "Requested by {0}".format(self.Requester.name), icon_url = self.Requester.avatar_url)
-                    await self.bot.say('```\nVOTE TERMINÉ !\n```', embed=VoteEmbed)
-                    self.VoteMess = None
-                    self.VoteTitle = None
-                    self.Requester = None
-                else:
-                    await self.bot.delete_message(ctx.message)
-                    await self.bot.say("```\nVous n'êtes pas le requêteur du vote\n```")
-            else:
-                await self.bot.delete_message(ctx.message)
-                await self.bot.say("```\nAucun vote n'est en cours\n```")
+        """Arrêter le vote en cours
+        Utilisable uniquement par le demandeur du vote déjà en cours."""
 
-        except Exception as e:
-            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
-            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
-            await self.bot.delete_message(ctx.message)
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def voters(self, ctx):
-        """Liste des votants et leur vote
-
-        Admins uniquement"""
-        
-        member = ctx.message.author
         await self.bot.delete_message(ctx.message)
-        
-        fmt = "```\n+-------------------------+----------+" + "\n|{0:25}|{1:10}|".format("Voter", "Vote") + "\n+-------------------------+----------+"
-        
-        if self.Voters != None:
-            if member.server_permissions.administrator == True:
-                for voter, vote in self.Voters.items():
-                    fmt += "\n|{0:25}|{1:10}|".format(voter, vote)
-                fmt += "\n+-------------------------+----------+\n```"
-                await self.bot.say(fmt)
-            else:
-                await self.bot.say("```\nVous n'êtes pas administrateur-e\n```")
+        if self.VoteState == True:
+            self.VoteEmbed.title = "Vote : " + self.subject + " [TERMINÉ]"
+            await self.bot.edit_message(self.Mess, embed=self.VoteEmbed)
+            await self.bot.clear_reactions(self.Mess)
         else:
-            await self.bot.say("```\nAucun vote n'a eu lieu\n```")
+            tmp = await self.bot.say('Aucun vote en cours')
+            await asyncio.sleep(5)
+            await self.bot.delete_message(tmp)
+
+    @bot.event
+    async def on_reaction_add(self, reaction, user):
+        if reaction.message.id == self.Mess.id:
+            if user == bot.user:
+                return
+            elif user not in self.Voters:
+                if reaction.emoji == "✔":
+                    await self.bot.remove_reaction(reaction.message, "✔", user)
+                    self.Voters.append(user)
+                    self.oui += 1
+                    self.VoteEmbed.set_field_at(0, name = "✔", value = self.oui)
+
+                    await self.bot.edit_message(self.Mess, embed=self.VoteEmbed)
+
+                elif reaction.emoji == "✖":
+                    await self.bot.remove_reaction(reaction.message, "✖", user)
+                    self.Voters.append(user)
+                    self.non += 1
+                    self.VoteEmbed.set_field_at(1, name = "✖", value = self.non)
+
+                    await self.bot.edit_message(self.Mess, embed=self.VoteEmbed)
+                else:
+                    await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
+            else:
+                await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
+                tmp = await self.bot.send_message(self.Mess.channel, "{0.mention} Vous avez déjà voté".format(user))
+                await asyncio.sleep(5)
+                await self.bot.delete_message(tmp)
 
 class Jeux:
     """Jeux proposés par le bot FtS"""
@@ -1598,6 +1516,11 @@ class Music:
             state.skip()
             print('[FTS] Music skipped by Requester')
 
+        elif voter.id == '187565415512276993':
+            await self.bot.say('Bot Master requested skipping song...')
+            state.skip()
+            print('[FTS] Music skipped by Bot Master')
+
         elif voter.server_permissions.administrator == True:
             await self.bot.say('Admin requested skipping song...')
             state.skip()
@@ -1800,10 +1723,8 @@ class RSS:
                 YTEmbed.set_footer(text = "Posté par {0}".format(entry['author']))
                 await self.bot.send_message(self.channel, "@everyone", embed = YTEmbed)
             else:
-                await self.bot.delete_message(ctx.message)
                 await self.bot.say("```Update failed```")
         else:
-            await self.bot.delete_message(ctx.message)
             await self.bot.say("```Vous n'avez pas la permission d'utiliser cette commande```")
 
     @commands.command(pass_context=True, no_pm=True)
@@ -1820,10 +1741,8 @@ class RSS:
             YTEmbed.set_footer(text = "Posté par {0}".format(entry['author']))
             await self.bot.send_message(self.channel, "@everyone", embed = YTEmbed)
         else:
-            await self.bot.delete_message(ctx.message)
             await self.bot.say("```Vous n'avez pas la permission d'utiliser cette commande```")
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('.'), description="Commandes Bot Fall to Sky")
 bot.add_cog(Messages(bot))
 bot.add_cog(Music(bot))
 bot.add_cog(Admin(bot))
