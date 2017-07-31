@@ -107,12 +107,9 @@ class VoiceState:
             await self.play_next_song.wait()
 
 class Anime:
-    """Animes related Commands"""
 
     def __init__(self,bot):
-
         self.bot = bot
-        self.voice_states = {}
         self.token = None
         self.params = {
             "grant_type":"client_credentials",
@@ -120,91 +117,212 @@ class Anime:
             "client_secret": getAniClientSecret()
         }
 
-    @commands.command(pass_context=True, no_pm=False)
-    async def anime(self, ctx, *, anime:str):
-        """Get anime informations"""
+    @commands.group(pass_context=True)
+    async def anilist(self, ctx):
+        """Commandes de requêtes d'informations sur des animes et mangas
+        de la base de données d'Anilist.
+        Langue de la base de données : EN
+
+        Utilisation :
+            .anilist anime <anime à rechercher>
+            .anilist manga <manga à rechercher>"""
+
+        if ctx.invoked_subcommand is None:
+            await self.bot.delete_message(ctx.message)
+            await self.bot.say("```md\nSyntaxe invalide. Voir .help anilist pour plus d'informations sur comment utiliser cette commande.\n```")
+
+    @anilist.command(pass_context=True, no_pm=False)
+    async def anime(self, ctx, *, anime : str):
+        """Récupère les informations concernant un anime
+        Base de données utilisée : AniList.co
+        Langue de la base de données : EN"""
+
+        await self.bot.delete_message(ctx.message)
+        tmp = await self.bot.say('Processing request')
+
+        if self.token == None:
+            self.token = anilist.auth(self.params)
 
         try:
-            await self.bot.delete_message(ctx.message)
-            tmp = await self.bot.say('Processing request')
-            
-            if self.token == None:
-                self.token = anilist.auth(self.params)
-
-            data = anilist.getAnimeInfo(anime, self.token)
-
-            AnimeEmbed = discord.Embed()
-            AnimeEmbed.title = str(data['title_english']) + " | " + str(data['title_japanese']) + " (" + str(data['id']) + ")"
-            AnimeEmbed.colour = 0x3498db
-            AnimeEmbed.set_thumbnail(url=data["image_url_lge"])
-            AnimeEmbed.add_field(name = "Type", value = data["type"])
-            AnimeEmbed.add_field(name = "Episodes", value = data['total_episodes'])
-            AnimeEmbed.add_field(name = "Source", value = data['source'])
-            AnimeEmbed.add_field(name = "Status", value = data['airing_status'])
-            AnimeEmbed.add_field(name = "Genre(s)", value = anilist.getAnimeGenres(data), inline = False)
-            AnimeEmbed.add_field(name = "Episode Length", value = str(data['duration']) + " mins/ep")
-            AnimeEmbed.add_field(name = "Score", value = str(data['average_score']) + " / 100")
-            AnimeEmbed.add_field(name = "Synopsis", value = anilist.formatAnimeDescription(data), inline = False)
-            AnimeEmbed.set_footer(text = anilist.formatAnimeDate(data))
-
+            results = anilist.getAnimes(anime, self.token)
+            results = results[:9]
+        except KeyError as e:
             await self.bot.delete_message(tmp)
-            await self.bot.say(embed=AnimeEmbed)
-
-        except AttributeError:
-            await self.bot.delete_message(tmp)
-            await self.bot.say("```py\nAnime not found\n```")
-        except IndexError:
-            await self.bot.delete_message(tmp)
-            await self.bot.say("```py\nWe got a problem with this anime, please try another\n```")
-        except Exception as e:
-            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
-            await self.bot.delete_message(tmp)
+            fmt = '```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
+            return
 
-    @commands.command(pass_context=True, no_pm=False)
-    async def manga(self, ctx, *, manga:str):
-        """Get manga informations"""
+        ResultsEmbed = discord.Embed()
+        ResultsEmbed.title = "Choisissez parmi ces résultats :"
+        ResultsEmbed.colour = 0x3498db
+        ResultsEmbed.description = ""
+        ResultsEmbed.set_footer(text = anime)
+
+        i = 0
+        for x in results:
+            i += 1
+            j = str(i)
+            if i > 9:
+                break
+            else:
+                ResultsEmbed.description += "[{}]() - {} - {}\n".format(j, x[0], x[1])
+
+        await self.bot.delete_message(tmp)
+        resultsMessage = await self.bot.say(embed=ResultsEmbed)
+
+        emotes = [
+            u"\u0031\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0032\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0033\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0034\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0035\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0036\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0037\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0038\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0039\N{COMBINING ENCLOSING KEYCAP}"
+        ]
+
+        listing = []
+        for emote, title in zip(emotes, results):
+            dc = {emote:title}
+            listing.append(dc)
+
+        for x in range(0, len(results)):
+            await self.bot.add_reaction(resultsMessage, emotes[x])
+
+        await asyncio.sleep(1)
+        res = await self.bot.wait_for_reaction(emotes, message=resultsMessage)
+        react = res.reaction.emoji
+        await self.bot.clear_reactions(resultsMessage)
+        await self.bot.delete_message(resultsMessage)
+
+        for l in listing:
+            try:
+                title = l[react]
+            except KeyError:
+                continue
+
+        index = results.index(title)
+
+        tmp = await self.bot.say("Processing request for {}".format(title))
+
+        data = anilist.getAnimeInfo(anime, self.token, int(index))
+
+        AnimeEmbed = discord.Embed()
+        AnimeEmbed.title = str(data['title_english']) + " | " + str(data['title_japanese']) + " (" + str(data['id']) + ")"
+        AnimeEmbed.colour = 0x3498db
+        AnimeEmbed.set_thumbnail(url=data["image_url_lge"])
+        AnimeEmbed.add_field(name = "Type", value = data["type"])
+        AnimeEmbed.add_field(name = "Episodes", value = data['total_episodes'])
+        AnimeEmbed.add_field(name = "Source", value = data['source'])
+        AnimeEmbed.add_field(name = "Status", value = data['airing_status'].capitalize())
+        AnimeEmbed.add_field(name = "Genre(s)", value = anilist.getAnimeGenres(data), inline = False)
+        AnimeEmbed.add_field(name = "Episode Length", value = str(data['duration']) + " mins/ep")
+        AnimeEmbed.add_field(name = "Score", value = str(data['average_score']) + " / 100")
+        AnimeEmbed.add_field(name = "Synopsis", value = anilist.formatAnimeDescription(data), inline = False)
+        AnimeEmbed.set_footer(text = anilist.formatAnimeDate(data))
+
+        await self.bot.delete_message(tmp)
+        await self.bot.say(embed=AnimeEmbed)
+
+    @anilist.command(pass_context=True, no_pm=False)
+    async def manga(self, ctx, *, anime : str):
+        """Récupère les informations concernant un manga
+        Base de données utilisée : AniList.co
+        Langue de la base de données : EN"""
+
+        await self.bot.delete_message(ctx.message)
+        tmp = await self.bot.say('Processing request')
+
+        if self.token == None:
+            self.token = anilist.auth(self.params)
 
         try:
-            await self.bot.delete_message(ctx.message)
-            tmp = await self.bot.say('Processing request')
-
-            if self.token == None:
-                self.token = anilist.auth(self.params)
-
-            data = anilist.getMangaInfo(manga, self.token)
-
-            if data['total_volumes'] == 0:
-                data['total_volumes'] = '-'
-
-            if data['total_chapters'] == 0:
-                data['total_chapters'] = '-'
-
-            MangaEmbed = discord.Embed()
-            MangaEmbed.title = str(data['title_english']) + " | " + str(data['title_japanese']) + "\n(" + str(data['id']) + ")"
-            MangaEmbed.colour = 0x3498db
-            MangaEmbed.set_thumbnail(url=data['image_url_lge'])
-            MangaEmbed.add_field(name = 'Type', value = data['type'])
-            MangaEmbed.add_field(name = 'Volumes', value = data['total_volumes'])
-            MangaEmbed.add_field(name = 'Chapters', value = data['total_chapters'])
-            MangaEmbed.add_field(name = 'Status', value = data["publishing_status"])
-            MangaEmbed.add_field(name = 'Genre(s)', value = anilist.getAnimeGenres(data), inline = False)
-            MangaEmbed.add_field(name = 'Score', value = str(data['average_score']) + " / 100")
-            MangaEmbed.add_field(name = "Synopsis", value = anilist.formatAnimeDescription(data), inline = False)
-            MangaEmbed.set_footer(text = anilist.formatAnimeDate(data))
-
+            results = anilist.getMangas(anime, self.token)
+            results = results[:9]
+        except KeyError as e:
             await self.bot.delete_message(tmp)
-            await self.bot.say(embed=MangaEmbed)
-        except AttributeError:
-            await self.bot.delete_message(tmp)
-            await self.bot.say("```py\nManga not found\n```")
-        except IndexError:
-            await self.bot.delete_message(tmp)
-            await self.bot.say("```py\nWe got a problem with this manga, please try another\n```")
-        except Exception as e:
-            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
-            await self.bot.delete_message(tmp)
+            fmt = '```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
+            return
+
+        ResultsEmbed = discord.Embed()
+        ResultsEmbed.title = "Choisissez parmi ces résultats :"
+        ResultsEmbed.colour = 0x3498db
+        ResultsEmbed.description = ""
+        ResultsEmbed.set_footer(text = anime)
+
+        i = 0
+        for x in results:
+            i += 1
+            j = str(i)
+            if i > 9:
+                break
+            else:
+                ResultsEmbed.description += "[{}]() - {} - {}\n".format(j, x[0], x[1])
+
+        await self.bot.delete_message(tmp)
+        resultsMessage = await self.bot.say(embed=ResultsEmbed)
+
+        emotes = [
+            u"\u0031\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0032\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0033\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0034\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0035\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0036\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0037\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0038\N{COMBINING ENCLOSING KEYCAP}", 
+            u"\u0039\N{COMBINING ENCLOSING KEYCAP}"
+        ]
+
+        listing = []
+        for emote, title in zip(emotes, results):
+            dc = {emote:title}
+            listing.append(dc)
+
+        for x in range(0, len(results)):
+            await self.bot.add_reaction(resultsMessage, emotes[x])
+
+        await asyncio.sleep(1)
+        res = await self.bot.wait_for_reaction(emotes, message=resultsMessage)
+        react = res.reaction.emoji
+        await self.bot.clear_reactions(resultsMessage)
+        await self.bot.delete_message(resultsMessage)
+
+        for l in listing:
+            try:
+                title = l[react]
+            except KeyError:
+                continue
+
+        index = results.index(title)
+
+        tmp = await self.bot.say("Processing request for {}".format(title))
+
+        data = anilist.getMangaInfo(anime, self.token, int(index))
+
+        if data['total_volumes'] == 0:
+            data['total_volumes'] = '-'
+
+        if data['total_chapters'] == 0:
+            data['total_chapters'] = '-'
+
+        MangaEmbed = discord.Embed()
+        MangaEmbed.title = str(data['title_english']) + " | " + str(data['title_japanese']) + "\n(" + str(data['id']) + ")"
+        MangaEmbed.colour = 0x3498db
+        MangaEmbed.set_thumbnail(url=data['image_url_lge'])
+        MangaEmbed.add_field(name = 'Type', value = data['type'])
+        MangaEmbed.add_field(name = 'Volumes', value = str(data['total_volumes']))
+        MangaEmbed.add_field(name = 'Chapters', value = str(data['total_chapters']))
+        MangaEmbed.add_field(name = 'Status', value = data["publishing_status"].capitalize())
+        MangaEmbed.add_field(name = 'Genre(s)', value = anilist.getAnimeGenres(data), inline = False)
+        MangaEmbed.add_field(name = 'Score', value = str(data['average_score']) + " / 100")
+        MangaEmbed.add_field(name = "Synopsis", value = anilist.formatAnimeDescription(data), inline = False)
+        MangaEmbed.set_footer(text = anilist.formatAnimeDate(data))
+
+        await self.bot.delete_message(tmp)
+        await self.bot.say(embed=MangaEmbed)
 
 class LeagueOfLegends:
     """Commandes reliées à League of Legends"""
@@ -670,8 +788,20 @@ class Vote:
         self.oui = None
         self.non = None
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def votestart(self, ctx, *, subject : str):
+    @commands.group(pass_context=True)
+    async def vote(self, ctx):
+        """Commandes de vote.
+
+        Utilisation :
+            .vote start <sujet du vote>
+            .vote stop"""
+
+        if ctx.invoked_subcommand is None:
+            await self.bot.delete_message(ctx.message)
+            await self.bot.say("```md\nSyntaxe invalide. Voir .help vote pour plus d'informations sur comment utiliser cette commande.\n```")
+
+    @vote.command(pass_context=True, no_pm=True)
+    async def start(self, ctx, *, subject : str):
         """Démarrer un vote"""
 
         await self.bot.delete_message(ctx.message)
@@ -687,7 +817,6 @@ class Vote:
             self.VoteEmbed = discord.Embed()
             self.VoteEmbed.title = "Vote : " + self.subject
             self.VoteEmbed.colour = 0x3498db
-            self.VoteEmbed.description = "_ _"
             self.VoteEmbed.set_footer(text = "Requested by {0}".format(self.Requester.name), icon_url = self.Requester.avatar_url)
             self.VoteEmbed.add_field(name = "✅", value = self.oui)
             self.VoteEmbed.add_field(name = "❎", value = self.non)
@@ -697,13 +826,44 @@ class Vote:
 
             await self.bot.add_reaction(mess, "✅")
             await self.bot.add_reaction(mess, "❎")
+            await asyncio.sleep(1)
+
+            while self.VoteState == True:
+                res = await self.bot.wait_for_reaction(["✅","❎"], message = self.Mess)
+                user = res.user
+                reaction = res.reaction
+
+                if user not in self.Voters:
+                    if reaction.emoji == "✅":
+                        await self.bot.remove_reaction(reaction.message, "✅", user)
+                        self.Voters.append(user)
+                        self.oui += 1
+                        self.VoteEmbed.set_field_at(0, name = "✅", value = self.oui)
+
+                        await self.bot.edit_message(self.Mess, embed=self.VoteEmbed)
+
+                    elif reaction.emoji == "❎":
+                        await self.bot.remove_reaction(reaction.message, "❎", user)
+                        self.Voters.append(user)
+                        self.non += 1
+                        self.VoteEmbed.set_field_at(1, name = "❎", value = self.non)
+
+                        await self.bot.edit_message(self.Mess, embed=self.VoteEmbed)
+                    else:
+                        await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
+                else:
+                    await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
+                    tmp = await self.bot.send_message(self.Mess.channel, "{0.mention} Vous avez déjà voté".format(user))
+                    await asyncio.sleep(5)
+                    await self.bot.delete_message(tmp)
+
         else:
             tmp = await self.bot.say('Vote déjà en cours')
             await asyncio.sleep(5)
             await self.bot.delete_message(tmp)
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def votestop(self, ctx):
+    @vote.command(pass_context=True, no_pm=True)
+    async def stop(self, ctx):
         """Arrêter le vote en cours
         Utilisable uniquement par le demandeur du vote déjà en cours."""
 
@@ -717,35 +877,6 @@ class Vote:
             tmp = await self.bot.say('Aucun vote en cours')
             await asyncio.sleep(5)
             await self.bot.delete_message(tmp)
-
-    @bot.event
-    async def on_reaction_add(self, reaction, user):
-        if reaction.message.id == self.Mess.id:
-            if user == bot.user:
-                return
-            elif user not in self.Voters:
-                if reaction.emoji == "✅":
-                    await self.bot.remove_reaction(reaction.message, "✅", user)
-                    self.Voters.append(user)
-                    self.oui += 1
-                    self.VoteEmbed.set_field_at(0, name = "✅", value = self.oui)
-
-                    await self.bot.edit_message(self.Mess, embed=self.VoteEmbed)
-
-                elif reaction.emoji == "❎":
-                    await self.bot.remove_reaction(reaction.message, "❎", user)
-                    self.Voters.append(user)
-                    self.non += 1
-                    self.VoteEmbed.set_field_at(1, name = "❎", value = self.non)
-
-                    await self.bot.edit_message(self.Mess, embed=self.VoteEmbed)
-                else:
-                    await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
-            else:
-                await self.bot.remove_reaction(reaction.message, reaction.emoji, user)
-                tmp = await self.bot.send_message(self.Mess.channel, "{0.mention} Vous avez déjà voté".format(user))
-                await asyncio.sleep(5)
-                await self.bot.delete_message(tmp)
 
 class Jeux:
     """Jeux proposés par le bot FtS"""
@@ -1138,7 +1269,6 @@ class Messages:
 
     def __init__(self, bot):
         self.bot = bot
-        self.voice_states = {}
 
     @commands.command(pass_context=True, no_pm=False)
     async def hi(self, ctx):
@@ -1244,6 +1374,7 @@ class Messages:
         if member.server_permissions.manage_messages == True:
             print('[FTS] Proceding purge...')
 
+            await self.bot.delete_message(ctx.message)
             await self.bot.purge_from(ctx.message.channel, limit = limit)
 
             print('[FTS] Purge done')
@@ -1251,7 +1382,6 @@ class Messages:
         else:
             await self.bot.delete_message(ctx.message)
             await self.bot.say("Vous n'avez pas l'autorisation de gérer les messages")
-            print('[FTS] Purge : Command aborted : User do not have manage_messages permission')
 
     @commands.command(pass_context=True, no_pm=True)
     async def purgeuser(self, ctx, limit=10, *, user:discord.Member):
@@ -1270,11 +1400,12 @@ class Messages:
                 return m.author == user 
 
             print('[FTS] Proceding purge...')
-
+            
+            await self.bot.delete_message(ctx.message)
             deleted = await self.bot.purge_from(ctx.message.channel, limit = limit, check = compare)
 
             FeedBack = await self.bot.say("```{2} messages de {0} parmi les {1} derniers messages supprimés```".format(user.name, limit, len(deleted)))
-            await asyncio.sleep(10)
+            await asyncio.sleep(5)
             await self.bot.delete_message(FeedBack)
 
             print('[FTS] Purge done')
@@ -1282,7 +1413,6 @@ class Messages:
         else:
             await self.bot.delete_message(ctx.message)
             await self.bot.say("Vous n'avez pas l'autorisation de gérer les messages")
-            print('[FTS] Purge : Command aborted : User do not have manage_messages permission')
 
     @commands.command(pass_context=True, no_pm=False)
     async def addme(self, ctx):
@@ -1783,9 +1913,10 @@ async def on_member_join(member):
     server = member.server
     fmt = 'Bienvenue à {0.mention} sur {1.name} !'
     await bot.send_message(server, fmt.format(member, server))
-    rules = getServerRules()
-    await bot.send_message(member, rules)
-    print('[FTS] {0.name} has joined the server'.format(member))
+    if server.id == "187566036747419648":
+        rules = getServerRules()
+        await bot.send_message(member, rules)
+        print('[FTS] {0.name} has joined the server'.format(member))
 
 @bot.event
 async def on_member_remove(member):

@@ -54,7 +54,7 @@ def getSummonerScore(summonerid):
 
 def getSummonerIconUrl(summoner):
 	"""Récupère l'icône d'un invocateur"""
-	icon = 'https://avatar.leagueoflegends.com/EUW1/' + summoner + '.png'
+	icon = 'https://avatar.leagueoflegends.com/euw/' + summoner + '.png'
 	return icon
 
 #####################################################################################################################################################

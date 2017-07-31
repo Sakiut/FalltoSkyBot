@@ -25,19 +25,32 @@ def auth(params):
 
 #####################################################################################################################################################
 
-def getAnimeInfo(anime, token):
+def getAnimes(anime, token):
 	anime = str(anime)
 	q = requests.get('https://anilist.co/api/anime/search/{0}'.format(anime), params={'access_token':token})
 	data = q.json()
+	titles = []
+	try:
+		if data['error'] == {'status': 200, 'messages': ['No Results.']}:
+			raise KeyError('Anime not found')
+	except KeyError:
+		raise KeyError('Anime not found')
+	except Exception:
+		pass
 
-	if " " in anime:
-		anime = anime.split(" ")
-		anime = anime[0]
+	for dt in data:
+		titles.append([dt["title_english"], dt["type"]])
 
-	data = filter(lambda x: anime in x.get("title_english"), data)
-	data = list(data)
-	data = data[0]
 
+	return titles
+
+#####################################################################################################################################################
+
+def getAnimeInfo(anime, token, index:int):
+	anime = str(anime)
+	q = requests.get('https://anilist.co/api/anime/search/{0}'.format(anime), params={'access_token':token})
+	data = q.json()
+	data = data[index]
 	return data
 
 #####################################################################################################################################################
@@ -94,14 +107,31 @@ def formatAnimeDate(data):
 
 #####################################################################################################################################################
 
-def getMangaInfo(manga, token):
+def getMangas(manga, token):
 	manga = str(manga)
 	q = requests.get('https://anilist.co/api/manga/search/{0}'.format(manga), params={'access_token':token})
 	data = q.json()
-	data = filter(lambda x: x.get('type') == 'Manga', data)
-	data = list(data)
-	data = data[0]
+	titles = []
+	try:
+		if data['error'] == {'status': 200, 'messages': ['No Results.']}:
+			raise KeyError('Manga not found')
+	except KeyError:
+		raise KeyError('Manga not found')
+	except Exception:
+		pass
 
+	for dt in data:
+		titles.append([dt["title_english"], dt["type"]])
+
+	return titles
+
+#####################################################################################################################################################
+
+def getMangaInfo(manga, token, index:int):
+	manga = str(manga)
+	q = requests.get('https://anilist.co/api/manga/search/{0}'.format(manga), params={'access_token':token})
+	data = q.json()
+	data = data[index]
 	return data
 
 #####################################################################################################################################################

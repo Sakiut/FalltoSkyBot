@@ -195,7 +195,7 @@ def getServerEmojis(emojisObjects:list):
 #####################################################################################################################################################
 
 def getLDStats(pseudo):
-	"""Récupère les stats leveldown depuis leur site"""
+	"""Récupère les stats leveldown depuis le site"""
 
 	pseudo = str(pseudo)
 	url = "http://leveldown.fr/profile/{}".format(pseudo)
