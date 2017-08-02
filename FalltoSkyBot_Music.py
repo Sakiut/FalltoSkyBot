@@ -3,6 +3,7 @@
 import asyncio
 import discord
 from discord.ext import commands
+
 from libraries.perms import *
 from libraries.library import *
 from libraries import anilist
@@ -140,8 +141,7 @@ class Anime:
         await self.bot.delete_message(ctx.message)
         tmp = await self.bot.say('Processing request')
 
-        if self.token == None:
-            self.token = anilist.auth(self.params)
+        self.token = anilist.auth(self.params)
 
         try:
             results = anilist.getAnimes(anime, self.token)
@@ -234,8 +234,7 @@ class Anime:
         await self.bot.delete_message(ctx.message)
         tmp = await self.bot.say('Processing request')
 
-        if self.token == None:
-            self.token = anilist.auth(self.params)
+        self.token = anilist.auth(self.params)
 
         try:
             results = anilist.getMangas(anime, self.token)
@@ -1400,7 +1399,7 @@ class Messages:
                 return m.author == user 
 
             print('[FTS] Proceding purge...')
-            
+
             await self.bot.delete_message(ctx.message)
             deleted = await self.bot.purge_from(ctx.message.channel, limit = limit, check = compare)
 
