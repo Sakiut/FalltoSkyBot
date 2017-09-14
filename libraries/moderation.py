@@ -4,7 +4,7 @@ from libraries.library import *
 import os
 import pickle
 
-fileName = "./modo.data"
+fileName = "./data/modo.data"
 
 #####################################################################################################################################################
 

@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import requests
-from random import shuffle
-import time
-from decimal import *
-import sys
-import datetime
-import discord
+import 	requests
+from 	random 			import shuffle
+import 	time
+from 	decimal 		import *
+import 	sys
+import 	datetime
+import 	discord
 
-from riotwatcher import RiotWatcher
-from riotwatcher import EUROPE_WEST
-from riotwatcher import LoLException, error_404, error_429
-from libraries.perms import *
-from urllib import request
-import linecache
-import ast
+from 	libraries.perms import *
+from 	urllib 			import request
+import 	linecache
+import 	ast
 
 fileName = './config.txt'
 
@@ -49,7 +46,7 @@ def getServerRules():
 	fileName = './rules.txt'
 	with open(fileName) as f: rulesLines = f.read()
 
-	return rulesLines
+	return str(rulesLines, 'utf-8')
 
 #####################################################################################################################################################
 
@@ -108,6 +105,34 @@ def getAniClientSecret():
 			ClientSecret = Line[1]
 
 	return ClientSecret
+
+#####################################################################################################################################################
+
+def getMalID():
+
+	with open(fileName) as f: lines = f.read().splitlines()
+
+	for line in lines:
+		if line.startswith('malID='):
+			getLine = line
+			Line = getLine.split('=')
+			ClientID = Line[1]
+
+	return ClientID
+
+#####################################################################################################################################################
+
+def getMalPasswd():
+
+	with open(fileName) as f: lines = f.read().splitlines()
+
+	for line in lines:
+		if line.startswith('malPasswd='):
+			getLine = line
+			Line = getLine.split('=')
+			ClientID = Line[1]
+
+	return ClientID
 
 #####################################################################################################################################################
 
@@ -315,7 +340,7 @@ def getSplittedRules():
 	Split = []
 	for line in lines:
 		if line.startswith('[>]'):
-			Split.append(line)
+			Split.append(str(line,'utf-8'))
 
 	return Split
 
