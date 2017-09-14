@@ -178,7 +178,8 @@ class Admin:
         await self.bot.say(embed=ServerEmbed)
 
     @commands.command(pass_context=True, no_pm=False)
-    async def switchoff(self, ctx):
+    async def disconnect(self, ctx):
+        """Déconnecte le bot - Bot Master uniquement"""
         requester = ctx.message.author
         await self.bot.delete_message(ctx.message)
         if requester.id == '187565415512276993':
