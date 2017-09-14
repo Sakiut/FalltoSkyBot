@@ -8,8 +8,6 @@ import sys
 import datetime
 
 from riotwatcher import RiotWatcher
-from riotwatcher import EUROPE_WEST
-from riotwatcher import LoLException, error_404, error_429
 
 from libraries.perms import *
 from libraries.library import *
@@ -20,7 +18,7 @@ import ast
 
 ApiKey = getApiKey()
 
-w = RiotWatcher(ApiKey, default_region=EUROPE_WEST)
+w = RiotWatcher(ApiKey)
 
 #####################################################################################################################################################
 
