@@ -59,6 +59,11 @@ class Jeux:
         nb = emotes.index(react)
 
         money = casino.get(server, user, data)
+        if money == 0:
+            tmp = await self.bot.say("Votre cagnotte est vide, adressez-vous à Sakiut pour la remplir.")
+            await asyncio.sleep(2)
+            await self.bot.delete_message(tmp)
+            return
 
         mon_embed           = discord.Embed()
         mon_embed.colour    = 0x3498db
@@ -74,7 +79,8 @@ class Jeux:
         ok  = False
 
         async def send_tmp(msg):
-            tmp = await self.bot.say("Vous devez envoyer un nombre entier inférieur ou égal au montant de votre cagnotte et supérieur à 0.")
+            tmp = await self.bot.say("Vous devez envoyer un nombre entier inférieur ou égal au \
+                                    montant de votre cagnotte et supérieur à 0.")
             await self.bot.delete_message(msg)
             await asyncio.sleep(5)
             await self.bot.delete_message(tmp)
@@ -149,7 +155,7 @@ class Jeux:
         casino.post(server, user, data, money)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def money(self, ctx, user:discord.Member=None):
+    async def money(self, ctx, *, user:discord.Member=None):
         """Affiche votre cagnotte"""
 
         data        = casino.start()
@@ -166,3 +172,28 @@ class Jeux:
         mon_embed.title     = "Cagnotte : {}$".format(str(money))
         mon_embed.set_footer(text = "{0}#{1}".format(user.name, user.discriminator), icon_url = user.avatar_url)
         await self.bot.say(embed = mon_embed)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def add_money(self, ctx, *, user:discord.Member=None):
+        """Ajoute de l'argent à la cagnotte d'un utilisateur
+        Bot Master uniquement"""
+
+        data        = casino.start()
+        server      = ctx.message.server
+        if not user:
+            user    = ctx.message.author
+        chan        = ctx.message.channel
+
+        if ctx.message.author.id == "187565415512276993":
+            await self.bot.delete_message(ctx.message)
+            tmp = await self.bot.say("Combien voulez-vous ajouter à la cagnotte de {} ?".format(user.name))
+            ans = await self.bot.wait_for_message(author = ctx.message.author, channel = chan)
+            money = int(ans.content)
+            await self.bot.delete_message(ans)
+            casino.post(server, user, data, money)
+            await self.bot.delete_message(tmp)
+            tmp = await self.bot.say("Done")
+            await asyncio.sleep(3)
+            await self.bot.delete_message(tmp)
+        else:
+            return
