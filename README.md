@@ -1,3 +1,7 @@
+```
+OUTDATED
+```
+
 # FalltoSkyBot
 
 [![PyPI](https://img.shields.io/pypi/v/discord.py.svg)](https://pypi.python.org/pypi/discord.py/)
